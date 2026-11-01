@@ -63,6 +63,16 @@
   /* day switcher */
   .day{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px}
   .day .lbl{flex:1;text-align:center;font-weight:700}
+  .stopwatch{text-align:center;padding:20px 16px}
+  .sw-clock{font-size:56px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--accent-strong);line-height:1.1}
+  .sw-clock.idle{color:var(--muted)}
+  .sw-btn{height:60px;font-size:20px;margin-top:14px;border-radius:16px;color:#fff}
+  .sw-btn.go{background:var(--good);border-color:var(--good)}
+  .sw-btn.stop{background:var(--critical);border-color:var(--critical)}
+  .badge.run{background:var(--accent)}
+  .timerbar{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;font-variant-numeric:tabular-nums}
+  .timerbar .end-btn{color:var(--critical);height:34px;flex:none}
+  .timerbar .tclock{color:var(--accent-strong);font-size:16px}
   .day .sub{display:block;font-size:12px;font-weight:500;color:var(--muted)}
 
   /* exercise grid */
@@ -215,6 +225,15 @@ const dbV = (x, y) => `<line class="eq" x1="${x}" y1="${y-6}" x2="${x}" y2="${y+
 const ground = (x1 = 6, x2 = 58, y = 58) => `<line class="gr" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`;
 
 const ICONS = {
+  treadmill: `<rect class="eq" x="6" y="50" width="46" height="6" rx="3"/>` + EQ([48,50],[52,24],[44,22]) + EQ([44,30],[38,32]) +
+    fig({ h:[27,11], s:[26,19], p:[25,35], legs:[[[34,41],[31,49]],[[19,43],[12,46]]], arms:[[[32,25],[37,21]],[[20,26],[16,31]]] }),
+  rower: EQ([4,54],[58,54]) + EQ([10,54],[10,58]) + EQ([52,54],[52,58]) + `<circle class="eq" cx="52" cy="44" r="7"/>` + EQ([18,50],[26,50]) +
+    EQ([24,34],[48,42]) + `<rect class="eq" x="42" y="40" width="3.5" height="12" rx="1"/>` +
+    fig({ h:[13,24], s:[16,32], p:[22,47], legs:[[[33,36],[42,46]]], arms:[[[14,40],[24,34]]] }),
+  stepper: EQ([20,58],[20,49],[32,49],[32,40],[44,40],[44,31],[58,31]) +
+    fig({ h:[33,7], s:[33,15], p:[32,30], legs:[[[27,40],[28,49]],[[40,32],[40,40]]], arms:[[[38,21],[42,16]],[[28,21],[25,26]]] }),
+  bike: ground() + EQ([20,58],[26,46],[44,46]) + EQ([26,46],[22,30]) + EQ([17,30],[27,30]) + EQ([38,46],[44,22],[50,21]) + `<circle class="eq" cx="44" cy="50" r="6"/>` +
+    fig({ h:[40,9], s:[34,16], p:[23,28], legs:[[[33,36],[30,46]],[[30,32],[36,42]]], arms:[[[42,19],[48,22]]] }),
   bench: ground() + EQ([10,42],[48,42]) + EQ([14,42],[14,58]) + EQ([44,42],[44,58]) +
     fig({ h:[11,33], s:[18,36], p:[38,37], legs:[[[47,30],[52,57]]], arms:[[[19,26],[20,15]]] }) + barH(6, 34, 13),
   benchbb: EQ([12,46],[52,46]) + EQ([18,46],[18,58]) + EQ([46,46],[46,58]) + ground() +
@@ -286,6 +305,10 @@ ICONS.generic = `<g transform="translate(32 32) scale(2.4) translate(-32 -32)">$
 const icon = (key, cls = '') => `<svg class="ex ${cls}" viewBox="0 0 64 64" aria-hidden="true">${ICONS[key] || ICONS.generic}</svg>`;
 
 const BUILTIN = [
+  { id: 'treadmill', name: 'Laufband', icon: 'treadmill', cat: 'Aufwärmen', kind: 'cardio' },
+  { id: 'rower', name: 'Rudergerät', icon: 'rower', cat: 'Aufwärmen', kind: 'cardio' },
+  { id: 'stepper', name: 'Stepper', icon: 'stepper', cat: 'Aufwärmen', kind: 'cardio' },
+  { id: 'bike', name: 'Fahrrad', icon: 'bike', cat: 'Aufwärmen', kind: 'cardio' },
   { id: 'bench', name: 'Bankdrücken', icon: 'bench', cat: 'Brust' },
   { id: 'benchbb', name: 'Bankdrücken Langhantel', icon: 'benchbb', cat: 'Brust' },
   { id: 'incline', name: 'Schrägbankdrücken', icon: 'incline', cat: 'Brust' },
@@ -320,7 +343,7 @@ const BUILTIN = [
   { id: 'abmachine', name: 'Bauchmaschine', icon: 'abmachine', cat: 'Bauch' },
   { id: 'plank', name: 'Plank (Sekunden)', icon: 'plank', cat: 'Bauch' },
 ];
-const CATS = ['Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene'];
+const CATS = ['Aufwärmen', 'Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene'];
 
 /* ================= State & storage ================= */
 const S = {
@@ -333,7 +356,8 @@ const S = {
 const allExercises = () => [...BUILTIN.filter(b => !S.hidden.includes(b.id)), ...S.custom];
 const exById = id => BUILTIN.find(b => b.id === id) || S.custom.find(c => c.id === id);
 const sortedDayKeys = () => Object.keys(S.days).filter(k => (S.days[k].entries || []).some(e => validSets(e.sets).length)).sort().reverse();
-const validSets = sets => (sets || []).filter(s => s.w != null || s.r != null);
+const validSets = sets => (sets || []).filter(s => s.w != null || s.r != null || s.m != null);
+const isCardio = id => { const x = exById(id); return !!(x && x.kind === 'cardio'); };
 
 const Store = {
   mode: 'local', db: null, uid: null, chain: Promise.resolve(), timers: {},
@@ -391,8 +415,8 @@ const Store = {
     clearTimeout(this.timers[k]);
     const run = () => {
       const day = S.days[k];
-      const has = day && day.entries.some(e => validSets(e.sets).length);
-      if (has) { const d = { kind: 'day', date: k, entries: day.entries.map(e => ({ exId: e.exId, name: e.name, icon: e.icon, sets: validSets(e.sets).map(s => ({ w: s.w, r: s.r })) })).filter(e => e.sets.length) }; this.queue(() => this.col().doc('d_' + k).set(d)); }
+      const has = day && (day.run || day.entries.some(e => validSets(e.sets).length));
+      if (has) { const d = { kind: 'day', date: k, start: day.start || null, end: day.end || null, run: day.run || null, finished: day.finished || null, entries: day.entries.map(e => ({ exId: e.exId, name: e.name, icon: e.icon, sets: validSets(e.sets).map(s => s.m != null ? ({ m: s.m }) : ({ w: s.w ?? null, r: s.r ?? null })) })).filter(e => e.sets.length) }; this.queue(() => this.col().doc('d_' + k).set(d)); }
       else this.queue(() => this.col().doc('d_' + k).delete());
     };
     if (now) run(); else this.timers[k] = setTimeout(run, 800);
@@ -419,7 +443,37 @@ function bestEver(exId, beforeKey) {
     validSets(e.sets).forEach(s => { const v = e1rm(s.w, s.r) ?? (s.r || 0); if (best == null || v > best) best = v; }); }
   return best;
 }
-const setsText = sets => validSets(sets).map(s => (s.w != null ? fmtNum(s.w) + ' kg × ' : '') + (s.r ?? '–')).join(' · ');
+const setsText = sets => validSets(sets).map(s => s.m != null ? fmtNum(s.m) + ' min' : (s.w != null ? fmtNum(s.w) + ' kg × ' : '') + (s.r ?? '–')).join(' · ');
+const clock = sec => { sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60; return (h ? h + ':' + pad(m) : m) + ':' + pad(x); };
+const hhmm = t => new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+const fmtDur = ms => { const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + pad(m % 60) + ' min'; };
+const LIVE_MS = 30 * 60000; // nach 30 min ohne Eintrag gilt das Training als beendet
+function touchDay(k) { if (k !== todayKey()) return; const d = S.days[k]; if (!d) return; const now = Date.now(); if (!d.start) d.start = now; d.end = now; d.finished = null; }
+function timerInfo(k) { const d = S.days[k]; if (!d || !d.start) return null; const live = !d.finished && k === todayKey() && (!!d.run || Date.now() - (d.end || d.start) < LIVE_MS); return { live, start: d.start, end: d.end || d.start }; }
+function timerHTML(k) {
+  const t = timerInfo(k);
+  if (!t) return k === todayKey() ? '<span class="muted">⏱ Die Trainingszeit startet mit „Start“ beim Aufwärmen oder mit deinem ersten Eintrag</span>' : '';
+  if (t.live) return `<div class="row between"><div>⏱ <b class="tclock" data-timer="${k}">${clock((Date.now() - t.start) / 1000)}</b> <span class="muted">seit ${hhmm(t.start)}</span></div><button class="btn sm end-btn" data-act="finish-day">■ Training beenden</button></div>`;
+  return `${S.days[k].finished ? '✅ Training beendet · ' : '⏱ '}Trainingszeit <b>${fmtDur(t.end - t.start)}</b> <span class="muted">(${hhmm(t.start)}–${hhmm(t.end)})</span>`;
+}
+function runOf(k) { const d = S.days[k]; return d && d.run ? d.run : null; }
+function startRun(k, exId) {
+  if (k !== todayKey()) { toast('Start/Stopp geht nur für heute.'); return; }
+  getEntry(k, exId, true); const d = S.days[k];
+  if (d.run && d.run.exId !== exId) stopRun(k);
+  const now = Date.now(); if (!d.start) d.start = now; d.end = now;
+  d.run = { exId, t0: now }; Store.saveDay(k, true);
+}
+function stopRun(k) {
+  const d = S.days[k]; if (!d || !d.run) return;
+  const e = getEntry(k, d.run.exId, true); if (!e.sets.length) e.sets.push({ m: null });
+  const mins = Math.max(1, Math.round((Date.now() - d.run.t0) / 60000));
+  e.sets[0].m = (e.sets[0].m || 0) + mins;
+  d.run = null; touchDay(k); Store.saveDay(k, true);
+  toast(mins + ' min eingetragen');
+}
+setInterval(() => { document.querySelectorAll('[data-run]').forEach(el => { const r = runOf(el.dataset.run); if (r) el.textContent = clock((Date.now() - r.t0) / 1000); }); }, 1000);
+setInterval(() => { document.querySelectorAll('[data-timer]').forEach(el => { const t = timerInfo(el.dataset.timer); if (t && t.live) el.textContent = clock((Date.now() - t.start) / 1000); }); }, 1000);
 const topSet = sets => validSets(sets).reduce((b, s) => { const v = e1rm(s.w, s.r) ?? (s.r || 0) / 1000; return !b || v > b.v ? { ...s, v } : b; }, null);
 const volume = sets => validSets(sets).reduce((a, s) => a + (s.w || 0) * (s.r || 0), 0);
 function suggestion(prev) {
@@ -447,7 +501,8 @@ function viewToday() {
   const doneCount = day ? day.entries.filter(e => validSets(e.sets).length).length : 0;
   let h = `<div class="day"><button class="icon-btn" data-act="day" data-d="-1" aria-label="Vorheriger Tag">${SV.left}</button>
     <div class="lbl">${esc(relDay(k))}<span class="sub">${fmtKey(k, { day: '2-digit', month: 'long', year: 'numeric' })}${doneCount ? ' · ' + doneCount + (doneCount === 1 ? ' Übung' : ' Übungen') : ''}</span></div>
-    <button class="icon-btn" data-act="day" data-d="1" aria-label="Nächster Tag" ${k >= todayKey() ? 'disabled style="opacity:.3"' : ''}>${SV.right}</button></div>`;
+    <button class="icon-btn" data-act="day" data-d="1" aria-label="Nächster Tag" ${k >= todayKey() ? 'disabled style="opacity:.3"' : ''}>${SV.right}</button></div>
+    ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
   const list = allExercises();
   CATS.forEach(cat => {
     const items = list.filter(x => (x.cat || 'Eigene') === cat);
@@ -455,7 +510,7 @@ function viewToday() {
     h += `<h2>${cat === 'Eigene' ? 'Eigene Übungen' : cat}</h2><div class="grid">`;
     items.forEach(x => {
       const e = getEntry(k, x.id); const n = e ? validSets(e.sets).length : 0;
-      h += `<button class="tile ${n ? 'done' : ''}" data-act="open-ex" data-id="${x.id}">${n ? `<span class="badge">${n} ${n === 1 ? 'Satz' : 'Sätze'}</span>` : ''}${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span>${lastLine(x.id, k)}</button>`;
+      h += `<button class="tile ${n ? 'done' : ''}" data-act="open-ex" data-id="${x.id}">${runOf(k) && runOf(k).exId === x.id ? '<span class="badge run">▶ läuft</span>' : n ? `<span class="badge">${x.kind === 'cardio' ? fmtNum(validSets(e.sets).reduce((a, s) => a + (s.m || 0), 0)) + ' min' : n + ' ' + (n === 1 ? 'Satz' : 'Sätze')}</span>` : ''}${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span>${lastLine(x.id, k)}</button>`;
     });
     if (cat === 'Eigene') h += `<button class="tile add" data-act="new-ex"><span class="plus">+</span><span class="nm">Übung hinzufügen</span></button>`;
     h += `</div>`;
@@ -465,6 +520,7 @@ function viewToday() {
 
 function lastLine(exId, k) {
   const p = previous(exId, k); if (!p) return '';
+  if (isCardio(exId)) return `<span class="last">${fmtNum(p.sets.reduce((a, s) => a + (s.m || 0), 0))} min</span>`;
   const t = topSet(p.sets);
   return `<span class="last">${t.w != null ? fmtNum(t.w) + ' kg × ' + (t.r ?? '–') : (t.r ?? '–') + ' Wdh.'}</span>`;
 }
@@ -474,9 +530,11 @@ function viewExercise() {
   const sets = e ? e.sets : [];
   const prev = previous(x.id, k);
   const best = bestEver(x.id, k);
+  if (x.kind === 'cardio') return viewCardio(x, k, sets, prev);
   let h = `<div class="ex-hero"><div class="ic">${icon(x.icon)}</div><div class="grow"><h2>${esc(x.name)}</h2>
     <div class="small muted">${esc(relDay(k))}, ${fmtKey(k, { day: '2-digit', month: '2-digit', year: 'numeric' })}</div></div>
-    <button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>`;
+    <button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>
+    ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
   if (prev) {
     h += `<div class="target"><div class="small t2">Letztes Mal (${esc(fmtKey(prev.date, { day: '2-digit', month: '2-digit' }))}): ${esc(setsText(prev.sets))}</div>
       <div style="margin-top:4px">Ziel heute: ${suggestion(prev)}</div></div>`;
@@ -495,6 +553,27 @@ function viewExercise() {
       ${pvol ? (vol > pvol ? `<span class="delta up">▲ ${fmtNum(vol - pvol)} kg mehr als letztes Mal</span>` : `<span class="muted">letztes Mal ${fmtNum(pvol)} kg</span>`) : ''}</div>`;
   }
   h += `<button class="btn block" data-act="close-ex" style="margin-top:16px">Fertig</button>`;
+  return h;
+}
+function viewCardio(x, k, sets, prev) {
+  const s0 = sets[0] || {}; const pm = prev ? prev.sets.reduce((a, s) => a + (s.m || 0), 0) : null;
+  let h = `<div class="ex-hero"><div class="ic">${icon(x.icon)}</div><div class="grow"><h2>${esc(x.name)}</h2>
+    <div class="small muted">Aufwärmen · ${esc(relDay(k))}, ${fmtKey(k, { day: '2-digit', month: '2-digit', year: 'numeric' })}</div></div>
+    <button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>
+    ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
+  h += prev ? `<div class="target"><div class="small t2">Letztes Mal (${esc(fmtKey(prev.date, { day: '2-digit', month: '2-digit' }))}): <b>${fmtNum(pm)} min</b></div></div>`
+            : '';
+  const run = runOf(k), mine = run && run.exId === x.id, other = run && !mine ? exById(run.exId) : null;
+  h += `<div class="card stopwatch">
+    ${mine ? `<div class="sw-clock" data-run="${k}">${clock((Date.now() - run.t0) / 1000)}</div><div class="small muted">läuft seit ${hhmm(run.t0)}</div>
+      <button class="btn block sw-btn stop" data-act="run-stop">■ Stopp</button>`
+    : `<div class="sw-clock idle">0:00</div>${other ? `<div class="small muted">${esc(other.name)} läuft gerade, Start beendet es.</div>` : `<div class="small muted">${k === todayKey() ? 'Start drücken, wenn du loslegst' : 'Für frühere Tage die Minuten unten eintragen'}</div>`}
+      <button class="btn block sw-btn go" data-act="run-start" ${k !== todayKey() ? 'disabled style="opacity:.4"' : ''}>▶ Start</button>`}
+  </div>`;
+  h += `<div class="card" style="padding:12px 16px"><table class="sets"><thead><tr><th>Dauer heute (Minuten)</th></tr></thead><tbody><tr>
+    <td><input inputmode="decimal" data-in="m" data-i="0" value="${s0.m != null ? String(s0.m).replace('.', ',') : ''}" placeholder="${pm != null ? fmtNum(pm) : '–'}">${prev ? `<div class="prev">zuletzt ${fmtNum(pm)} min</div>` : ''}</td>
+    </tr></tbody></table><div class="small muted" style="text-align:center;margin-top:4px">Wird bei „Stopp“ automatisch ausgefüllt, du kannst es aber auch selbst eintragen.</div></div>
+    <button class="btn block" data-act="close-ex" style="margin-top:12px">Fertig</button>`;
   return h;
 }
 // Zielvorgabe pro Satz aus dem letzten Training (doppelte Progression):
@@ -540,7 +619,7 @@ function viewHistory() {
     const open = S.openDay === k;
     h += `<div class="card"><div class="row" data-act="open-day" data-k="${k}" style="cursor:pointer">
       <div class="grow"><div class="title">${esc(relDay(k))}${relDay(k).length > 10 ? '' : ', ' + fmtKey(k, { day: '2-digit', month: '2-digit' })}</div>
-      <div class="small muted ellipsis">${entries.map(e => esc(e.name)).join(' · ')}</div></div><span class="muted">${open ? SV.up : SV.down}</span></div>`;
+      <div class="small muted ellipsis">${(() => { const d = S.days[k]; return d.start && d.end && d.end > d.start ? '⏱ ' + fmtDur(d.end - d.start) + ' · ' : ''; })()}${entries.map(e => esc(e.name)).join(' · ')}</div></div><span class="muted">${open ? SV.up : SV.down}</span></div>`;
     if (open) {
       h += `<div style="margin-top:8px">` + entries.map(e => `<div class="sess-ex">${icon(e.icon, 'ic')}<div class="grow"><div style="font-weight:600">${esc(e.name)}</div><div class="small t2">${esc(setsText(e.sets))}</div></div></div>`).join('') +
         `</div><div class="row" style="margin-top:10px"><button class="btn sm grow" data-act="edit-day" data-k="${k}">Bearbeiten</button><button class="btn sm danger" data-act="del-day" data-k="${k}">Tag löschen</button></div>`;
@@ -568,6 +647,7 @@ function seriesFor(exId, metric) {
     if (metric === 'orm') v = Math.max(...sets.map(s => e1rm(s.w, s.r) ?? -Infinity));
     if (metric === 'reps') v = Math.max(...sets.map(s => s.r ?? -Infinity));
     if (metric === 'vol') v = volume(sets);
+    if (metric === 'min') v = sets.reduce((a, s) => a + (s.m || 0), 0);
     if (isFinite(v) && v > 0) pts.push({ k, t: keyDate(k).getTime(), v, sets });
   });
   return pts;
@@ -579,18 +659,21 @@ function viewProgress() {
   if (!list.length) return `<div class="empty"><div class="big">📈</div>Sobald du Sätze eingetragen hast, siehst du hier deine Steigerung pro Übung.</div>`;
   if (!S.prog.ex || !used.has(S.prog.ex)) S.prog.ex = list[0].id;
   const x = used.get(S.prog.ex);
+  const cardio = x.kind === 'cardio' || isCardio(x.id);
+  const MET = cardio ? { min: ['Minuten', 'min'] } : METRICS;
+  const metric = cardio ? 'min' : S.prog.metric;
   let h = `<div class="chips">${list.map(e => `<button class="chip ${e.id === S.prog.ex ? 'on' : ''}" data-act="prog-ex" data-id="${e.id}">${icon(e.icon)}<span>${esc(e.name)}</span></button>`).join('')}</div>
-    <div class="seg" style="margin-top:6px">${Object.entries(METRICS).map(([k, [l]]) => `<button data-act="metric" data-m="${k}" class="${S.prog.metric === k ? 'on' : ''}">${l.replace(' (geschätzt)', '')}</button>`).join('')}</div>`;
-  const pts = seriesFor(S.prog.ex, S.prog.metric);
-  const [mLabel, unit] = METRICS[S.prog.metric];
+    <div class="seg" style="margin-top:6px">${Object.entries(MET).map(([k, [l]]) => `<button data-act="metric" data-m="${k}" class="${metric === k ? 'on' : ''}">${l.replace(' (geschätzt)', '')}</button>`).join('')}</div>`;
+  const pts = seriesFor(S.prog.ex, metric);
+  const [mLabel, unit] = MET[metric];
   if (!pts.length) return h + `<div class="empty">Für diese Kennzahl fehlen noch Werte.</div>`;
   const cur = pts[pts.length - 1].v, first = pts[0].v, best = Math.max(...pts.map(p => p.v)), diff = cur - first;
   h += `<div class="card" style="margin-top:12px"><div class="small muted">${esc(mLabel)} · ${esc(x.name)}</div>
     <div class="row" style="align-items:baseline;gap:8px;margin:2px 0 10px;flex-wrap:wrap"><span style="font-size:32px;font-weight:800;letter-spacing:-.02em">${fmtNum(cur)}</span><span class="t2">${unit}</span>
     ${pts.length > 1 ? `<span class="small delta ${diff >= 0 ? 'up' : 'down'}">${diff >= 0 ? '▲' : '▼'} ${fmtNum(Math.abs(diff))} ${unit} seit ${fmtKey(pts[0].k, { day: '2-digit', month: '2-digit' })}</span>` : ''}</div>
     <div class="chart-wrap chart" id="chart">${chartSVG(pts, unit)}<div class="tip" id="tip"></div></div>
-    <div class="small muted" style="margin-top:6px">Bestwert ${fmtNum(best)} ${unit} · ${pts.length} Trainingstage${S.prog.metric === 'orm' ? ' · 1RM = geschätztes Maximum für 1 Wiederholung' : ''}</div></div>
-    <h2>Einträge</h2><div class="card" style="padding-top:8px"><table class="data"><thead><tr><th>Datum</th><th>Sätze</th><th class="r">${esc(mLabel.replace(' (geschätzt)', ''))}</th></tr></thead><tbody>
+    <div class="small muted" style="margin-top:6px">Bestwert ${fmtNum(best)} ${unit} · ${pts.length} Trainingstage${metric === 'orm' ? ' · 1RM = geschätztes Maximum für 1 Wiederholung' : ''}</div></div>
+    <h2>Einträge</h2><div class="card" style="padding-top:8px"><table class="data"><thead><tr><th>Datum</th><th>${cardio ? 'Dauer' : 'Sätze'}</th><th class="r">${esc(mLabel.replace(' (geschätzt)', ''))}</th></tr></thead><tbody>
     ${[...pts].reverse().slice(0, 20).map(p => `<tr><td>${fmtKey(p.k, { day: '2-digit', month: '2-digit', year: '2-digit' })}</td><td class="t2 small">${esc(setsText(p.sets))}</td><td class="r"><b>${fmtNum(p.v)}</b></td></tr>`).join('')}
     </tbody></table></div>`;
   return h;
@@ -686,6 +769,20 @@ document.addEventListener('click', async ev => {
     case 'day': { const n = shiftKey(S.day, +el.dataset.d); if (n > todayKey()) return; S.day = n; render(); break; }
     case 'open-ex': S.ex = el.dataset.id; render(); window.scrollTo(0, 0);
       { const e = getEntry(S.day, S.ex); if (!e || !e.sets.length) { addSet(); } } break;
+    case 'finish-day': {
+      const k = S.day, d = S.days[k]; if (!d) return;
+      const ents = d.entries.filter(e => validSets(e.sets).length);
+      const sets = ents.reduce((a, e) => a + (isCardio(e.exId) ? 0 : validSets(e.sets).length), 0);
+      const dur = fmtDur(Date.now() - d.start);
+      if (!await modal({ title: 'Training beenden?', body: `Dauer: <b>${dur}</b><br>${ents.length} ${ents.length === 1 ? 'Übung' : 'Übungen'} · ${sets} ${sets === 1 ? 'Satz' : 'Sätze'}`, ok: 'Beenden' })) return;
+      if (d.run) stopRun(k);
+      d.end = Date.now(); d.finished = d.end; Store.saveDay(k, true); S.ex = null; render(); window.scrollTo(0, 0);
+      toast('Training beendet – stark! 💪');
+      break;
+    }
+    case 'run-start': unlockAudioSafe(); startRun(S.day, S.ex); render(); break;
+    case 'run-stop': stopRun(S.day); render(); break;
+    case 'quick-min': { const e = getEntry(S.day, S.ex, true); if (!e.sets.length) e.sets.push({ m: null }); e.sets[0].m = +el.dataset.m; touchDay(S.day); Store.saveDay(S.day); render(); break; }
     case 'close-ex': S.ex = null; render(); window.scrollTo(0, 0); break;
     case 'add-set': addSet(true); break;
     case 'del-set': { const e = getEntry(S.day, S.ex); if (!e) return; e.sets.splice(+el.dataset.i, 1); Store.saveDay(S.day); render(); break; }
@@ -745,12 +842,14 @@ function importBackup(v) {
     const d = JSON.parse(v); if (!d || typeof d.days !== 'object') throw 0;
     let n = 0;
     (d.custom || []).forEach(c => { if (c && c.id && !S.custom.some(x => x.id === c.id)) S.custom.push(c); });
-    Object.entries(d.days).forEach(([k, day]) => { if (/^\d{4}-\d\d-\d\d$/.test(k) && day && Array.isArray(day.entries) && !S.days[k]) { S.days[k] = { date: k, entries: day.entries }; Store.saveDay(k, true); n++; } });
+    Object.entries(d.days).forEach(([k, day]) => { if (/^\d{4}-\d\d-\d\d$/.test(k) && day && Array.isArray(day.entries) && !S.days[k]) { S.days[k] = { date: k, entries: day.entries, start: day.start || null, end: day.end || null }; Store.saveDay(k, true); n++; } });
     Store.saveSettings(); render(); toast(`${n} Trainingstage importiert`);
   } catch (e) { toast('Das ist kein gültiges Backup.'); }
 }
+function unlockAudioSafe() {}
 function addSet(focus) {
   const e = getEntry(S.day, S.ex, true);
+  if (isCardio(S.ex)) { if (!e.sets.length) e.sets.push({ m: null }); Store.saveCache(); render(); return; }
   const last = e.sets[e.sets.length - 1];
   const prev = previous(S.ex, S.day);
   const pv = prev && prev.sets[e.sets.length];
@@ -763,6 +862,7 @@ document.addEventListener('input', ev => {
   const el = ev.target; if (!el.dataset.in || !S.ex) return;
   const e = getEntry(S.day, S.ex, true), s = e.sets[+el.dataset.i]; if (!s) return;
   s[el.dataset.in] = num(el.value);
+  if (s[el.dataset.in] != null) touchDay(S.day);
   Store.saveDay(S.day);
   const g = document.getElementById('goal-' + el.dataset.i);
   if (g) { const tw = g.dataset.tw === '' ? null : +g.dataset.tw, tr = +g.dataset.tr;
