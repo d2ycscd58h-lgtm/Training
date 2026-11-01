@@ -101,6 +101,10 @@
   .sets input:focus{border-color:var(--accent)}
   .sets .prev{font-size:11px;color:var(--muted);margin-top:3px;font-variant-numeric:tabular-nums}
   .sets tr.up input{border-color:var(--good)}
+  .sets tr.tgt td{padding-top:6px}
+  .sets tr.tgt + tr td{padding-top:0}
+  .goal{font-size:12px;font-weight:600;color:var(--accent-strong);text-align:left;padding:0 2px;margin-bottom:-4px}
+  .goal.hit{color:var(--good-text)}
   .pr{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--good);border-radius:99px;padding:2px 7px;margin-left:6px;vertical-align:2px}
   .delta{font-weight:700}
   .delta.up{color:var(--good-text)} .delta.down{color:var(--critical)}
@@ -419,10 +423,8 @@ const setsText = sets => validSets(sets).map(s => (s.w != null ? fmtNum(s.w) + '
 const topSet = sets => validSets(sets).reduce((b, s) => { const v = e1rm(s.w, s.r) ?? (s.r || 0) / 1000; return !b || v > b.v ? { ...s, v } : b; }, null);
 const volume = sets => validSets(sets).reduce((a, s) => a + (s.w || 0) * (s.r || 0), 0);
 function suggestion(prev) {
-  const t = topSet(prev.sets); if (!t) return '';
-  if (t.w == null) return `<b>${(t.r || 0) + 1} Wdh.</b> schaffen`;
-  const step = t.w >= 40 ? 2.5 : 1;
-  return `<b>${fmtNum(t.w)} kg × ${(t.r || 0) + 1}</b> oder <b>${fmtNum(t.w + step)} kg × ${t.r || 0}</b>`;
+  const t = setTarget(prev.sets[0]); if (!t) return '';
+  return `<b>${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.</b> im 1. Satz <span class="small t2">– Ziele für jeden Satz stehen unten</span>`;
 }
 
 /* ================= Views ================= */
@@ -495,14 +497,29 @@ function viewExercise() {
   h += `<button class="btn block" data-act="close-ex" style="margin-top:16px">Fertig</button>`;
   return h;
 }
+// Zielvorgabe pro Satz aus dem letzten Training (doppelte Progression):
+// bis 11 Wdh. -> gleiches Gewicht, +1 Wdh.; ab 12 Wdh. -> mehr Gewicht, etwas weniger Wdh.
+function setTarget(p) {
+  if (!p || p.r == null) return null;
+  const r = p.r, w = p.w;
+  if (w == null || w <= 0) return { w: null, r: r + 1 };
+  const step = w >= 20 ? 2.5 : 1;
+  if (r >= 12) return { w: Math.round((w + step) * 10) / 10, r: Math.max(r - 4, 6) };
+  return { w, r: r + 1 };
+}
+const prevSetFor = (prev, i) => prev && prev.sets.length ? (prev.sets[i] || prev.sets[prev.sets.length - 1]) : null;
 function setRow(exId, s, i, prev, best) {
   const p = prev && prev.sets[i];
-  const cur = e1rm(num(s.w), num(s.r)), pv = p ? e1rm(p.w, p.r) : null;
+  const t = setTarget(prevSetFor(prev, i));
+  const cw = num(s.w), cr = num(s.r);
+  const cur = e1rm(cw, cr), pv = p ? e1rm(p.w, p.r) : null;
   const up = cur != null && pv != null && cur > pv + 1e-9;
   const isPR = cur != null && best != null && cur > best + 1e-9;
-  return `<tr class="${up ? 'up' : ''}"><td class="n">${i + 1}</td>
-    <td><input inputmode="decimal" data-in="w" data-i="${i}" value="${s.w != null ? String(s.w).replace('.', ',') : ''}" placeholder="${p && p.w != null ? fmtNum(p.w) : '0'}">${p ? `<div class="prev">zuletzt ${p.w != null ? fmtNum(p.w) : '–'}</div>` : ''}</td>
-    <td><input inputmode="numeric" data-in="r" data-i="${i}" value="${s.r ?? ''}" placeholder="${p && p.r != null ? p.r : '0'}">${p ? `<div class="prev">zuletzt ${p.r ?? '–'}${isPR ? '<span class="pr">Rekord</span>' : ''}</div>` : (isPR ? '<div class="prev"><span class="pr">Rekord</span></div>' : '')}</td>
+  const hit = t && cr != null && ((cr >= t.r && (t.w == null || (cw != null && cw >= t.w - 1e-9))) || (t.w != null && cur != null && cur >= e1rm(t.w, t.r) - 1e-9));
+  const goal = t ? `<tr class="tgt"><td></td><td colspan="2"><div class="goal ${hit ? 'hit' : ''}" id="goal-${i}" data-tw="${t.w ?? ''}" data-tr="${t.r}" data-txt="${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.">${hit ? '✓ Ziel erreicht: ' : '🎯 Ziel: '}${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.</div></td><td></td></tr>` : '';
+  return goal + `<tr class="${up ? 'up' : ''}"><td class="n">${i + 1}</td>
+    <td><input inputmode="decimal" data-in="w" data-i="${i}" value="${s.w != null ? String(s.w).replace('.', ',') : ''}" placeholder="${t && t.w != null ? fmtNum(t.w) : (p && p.w != null ? fmtNum(p.w) : '0')}">${p ? `<div class="prev">zuletzt ${p.w != null ? fmtNum(p.w) : '–'}</div>` : ''}</td>
+    <td><input inputmode="numeric" data-in="r" data-i="${i}" value="${s.r ?? ''}" placeholder="${t ? t.r : (p && p.r != null ? p.r : '0')}">${p ? `<div class="prev">zuletzt ${p.r ?? '–'}${isPR ? '<span class="pr">Rekord</span>' : ''}</div>` : (isPR ? '<div class="prev"><span class="pr">Rekord</span></div>' : '')}</td>
     <td style="width:40px"><button class="icon-btn" data-act="del-set" data-i="${i}" aria-label="Satz löschen" style="width:34px">${SV.x}</button></td></tr>`;
 }
 
@@ -737,7 +754,8 @@ function addSet(focus) {
   const last = e.sets[e.sets.length - 1];
   const prev = previous(S.ex, S.day);
   const pv = prev && prev.sets[e.sets.length];
-  e.sets.push({ w: last ? last.w : (pv ? pv.w : null), r: null });
+  const tg = setTarget(prevSetFor(prev, e.sets.length));
+  e.sets.push({ w: last ? last.w : (tg && tg.w != null ? tg.w : (pv ? pv.w : null)), r: null });
   Store.saveCache(); render();
   if (focus !== false) setTimeout(() => { const inp = document.querySelector(`[data-in="r"][data-i="${e.sets.length - 1}"]`); inp && inp.focus(); }, 30);
 }
@@ -746,6 +764,10 @@ document.addEventListener('input', ev => {
   const e = getEntry(S.day, S.ex, true), s = e.sets[+el.dataset.i]; if (!s) return;
   s[el.dataset.in] = num(el.value);
   Store.saveDay(S.day);
+  const g = document.getElementById('goal-' + el.dataset.i);
+  if (g) { const tw = g.dataset.tw === '' ? null : +g.dataset.tw, tr = +g.dataset.tr;
+    const hit = s.r != null && ((s.r >= tr && (tw == null || (s.w != null && s.w >= tw - 1e-9))) || (tw != null && s.w != null && e1rm(s.w, s.r) >= e1rm(tw, tr) - 1e-9));
+    g.classList.toggle('hit', hit); g.textContent = (hit ? '✓ Ziel erreicht: ' : '🎯 Ziel: ') + g.dataset.txt; }
 });
 document.addEventListener('keydown', ev => {
   if (ev.key !== 'Enter' || !ev.target.dataset.in) return;
