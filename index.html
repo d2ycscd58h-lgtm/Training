@@ -73,6 +73,22 @@
   .timerbar{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:14px;font-variant-numeric:tabular-nums}
   .timerbar .end-btn{color:var(--critical);height:34px;flex:none}
   .timerbar .tclock{color:var(--accent-strong);font-size:16px}
+  .day button.lbl{background:none;border:0;padding:4px 0;border-radius:10px}
+  .day button.lbl:active{background:var(--surface-2)}
+  .cal-ic{font-size:14px}
+  .cal{padding:10px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+  .cal-head div{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:2px 0 6px}
+  .cal-cell{min-width:0;padding-left:0;padding-right:0;aspect-ratio:1/1.15;border-radius:10px;background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding-top:5px;font-variant-numeric:tabular-nums}
+  .cal-cell.empty{background:none}
+  .cal-cell[disabled]{opacity:.35}
+  .cal-cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
+  .cal-cell.has{background:var(--surface-3)}
+  .cal-d{font-size:13px;font-weight:600;color:var(--text-2)}
+  .cal-tag{display:inline-block;max-width:100%;padding:2px 4px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;text-align:center;line-height:1.3}
+  .cal-tag.big{font-size:13px;padding:3px 7px}
+  .cal-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:4px;font-size:13px;color:var(--text-2)}
+  .cal-legend i{font-style:normal;display:inline-block;color:#fff;font-weight:800;font-size:11px;border-radius:5px;padding:1px 5px;margin-right:5px}
   .day .sub{display:block;font-size:12px;font-weight:500;color:var(--muted)}
 
   /* exercise grid */
@@ -350,7 +366,7 @@ const S = {
   custom: [],          // [{id,name,icon,cat}]
   hidden: [],          // ids of built-ins the user removed
   days: {},            // key -> {date, entries:[{exId,name,icon,sets:[{w,r}]}]}
-  tab: 'today', day: todayKey(), ex: null,
+  tab: 'today', day: todayKey(), ex: null, cal: null,
   prog: { ex: null, metric: 'max' }, openDay: null,
 };
 const allExercises = () => [...BUILTIN.filter(b => !S.hidden.includes(b.id)), ...S.custom];
@@ -491,6 +507,7 @@ function render() {
   $('#tabs').innerHTML = TABS.map(([k, l, i]) => `<button data-act="tab" data-tab="${k}" class="${S.tab === k ? 'on' : ''}">${i}${l}</button>`).join('');
   const hdr = { today: 'Training', history: 'Verlauf', progress: 'Fortschritt' }[S.tab];
   $('#hdr').textContent = S.tab === 'today' && S.ex ? '' : hdr;
+  if (S.tab === 'today' && S.cal) { $('#hdr').innerHTML = `<button class="btn sm" data-act="cal-close" style="padding-left:6px">${SV.back} Training</button>`; $('#main').innerHTML = viewCalendar(); return; }
   $('#hdr').innerHTML = S.tab === 'today' && S.ex ? `<button class="btn sm" data-act="close-ex" style="padding-left:6px">${SV.back} Übungen</button>` : esc(hdr);
   $('#main').innerHTML = S.tab === 'today' ? (S.ex ? viewExercise() : viewToday()) : S.tab === 'history' ? viewHistory() : viewProgress();
   if (S.tab === 'progress') wireChart();
@@ -500,7 +517,7 @@ function viewToday() {
   const k = S.day, day = S.days[k];
   const doneCount = day ? day.entries.filter(e => validSets(e.sets).length).length : 0;
   let h = `<div class="day"><button class="icon-btn" data-act="day" data-d="-1" aria-label="Vorheriger Tag">${SV.left}</button>
-    <div class="lbl">${esc(relDay(k))}<span class="sub">${fmtKey(k, { day: '2-digit', month: 'long', year: 'numeric' })}${doneCount ? ' · ' + doneCount + (doneCount === 1 ? ' Übung' : ' Übungen') : ''}</span></div>
+    <button class="lbl" data-act="cal-open" aria-label="Monatsübersicht öffnen">${esc(relDay(k))} <span class="cal-ic">📅</span><span class="sub">${fmtKey(k, { day: '2-digit', month: 'long', year: 'numeric' })}${doneCount ? ' · ' + doneCount + (doneCount === 1 ? ' Übung' : ' Übungen') : ''}</span></button>
     <button class="icon-btn" data-act="day" data-d="1" aria-label="Nächster Tag" ${k >= todayKey() ? 'disabled style="opacity:.3"' : ''}>${SV.right}</button></div>
     ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
   const list = allExercises();
@@ -635,6 +652,59 @@ function viewHistory() {
   return h;
 }
 
+/* ---- Monatsübersicht ---- */
+// Hauptmuskelgruppe eines Tages = Gruppe mit den meisten Sätzen (Aufwärmen/Bauch/Arme zählen nur, wenn sonst nichts da ist)
+const GROUPS = {
+  'Brust': { ab: 'Br', col: '#3987e5' }, 'Rücken': { ab: 'Rü', col: '#d95926' }, 'Beine': { ab: 'Be', col: '#199e70' },
+  'Schultern': { ab: 'Sch', col: '#9085e9' }, 'Arme': { ab: 'Ar', col: '#c98500' }, 'Bauch': { ab: 'Ba', col: '#d55181' },
+  'Aufwärmen': { ab: 'Au', col: '#77766f' }, 'Eigene': { ab: '✓', col: '#77766f' },
+};
+const LEGACY_CAT = { row: 'Rücken' };
+function catOf(e) { const x = exById(e.exId); return x ? (x.cat || 'Eigene') : (LEGACY_CAT[e.exId] || 'Eigene'); }
+function mainGroup(k) {
+  const d = S.days[k]; if (!d) return null;
+  const cnt = {};
+  d.entries.forEach(e => { const n = validSets(e.sets).length; if (n) { const c = catOf(e); cnt[c] = (cnt[c] || 0) + n; } });
+  const order = ['Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene', 'Aufwärmen'];
+  const primary = ['Brust', 'Rücken', 'Beine', 'Schultern'];
+  let pool = primary.filter(c => cnt[c]);
+  if (!pool.length) pool = order.filter(c => cnt[c]);
+  if (!pool.length) return null;
+  return pool.sort((a, b) => cnt[b] - cnt[a] || order.indexOf(a) - order.indexOf(b))[0];
+}
+function viewCalendar() {
+  const { y, m } = S.cal;
+  const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
+  const lead = (first.getDay() + 6) % 7, today = todayKey();
+  const title = first.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+  const stats = {}; let total = 0;
+  let cells = '';
+  for (let i = 0; i < lead; i++) cells += '<div class="cal-cell empty"></div>';
+  for (let d = 1; d <= days; d++) {
+    const k = `${y}-${pad(m + 1)}-${pad(d)}`, g = mainGroup(k);
+    if (g) { stats[g] = (stats[g] || 0) + 1; total++; }
+    const G = g && GROUPS[g];
+    cells += `<button class="cal-cell ${k === today ? 'today' : ''} ${g ? 'has' : ''}" ${g ? `data-act="cal-day" data-k="${k}"` : (k <= today ? `data-act="cal-goto" data-k="${k}"` : 'disabled')}>
+      <span class="cal-d">${d}</span>${G ? `<span class="cal-tag" style="background:${G.col}">${G.ab}</span>` : ''}</button>`;
+  }
+  const next = new Date(y, m + 1, 1) > new Date();
+  return `<div class="day"><button class="icon-btn" data-act="cal-month" data-d="-1" aria-label="Vormonat">${SV.left}</button>
+      <div class="lbl" style="cursor:default">${esc(title)}<span class="sub">${total} ${total === 1 ? 'Trainingstag' : 'Trainingstage'}</span></div>
+      <button class="icon-btn" data-act="cal-month" data-d="1" aria-label="Nächster Monat" ${next ? 'disabled style="opacity:.3"' : ''}>${SV.right}</button></div>
+    <div class="card cal" style="margin-top:12px">
+      <div class="cal-grid cal-head">${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(w => `<div>${w}</div>`).join('')}</div>
+      <div class="cal-grid">${cells}</div></div>
+    ${total ? `<div class="cal-legend">${Object.keys(GROUPS).filter(g => stats[g]).map(g => `<span><i style="background:${GROUPS[g].col}">${GROUPS[g].ab}</i>${esc(g)} <b>${stats[g]}×</b></span>`).join('')}</div>` : '<div class="empty small">In diesem Monat noch kein Training eingetragen.</div>'}
+    <div class="small muted" style="margin-top:10px">Tippe auf einen Tag, um zu sehen, was du trainiert hast. Das Kürzel zeigt die Hauptmuskelgruppe, also die mit den meisten Sätzen.</div>`;
+}
+function daySummaryHTML(k) {
+  const d = S.days[k]; const ents = d.entries.filter(e => validSets(e.sets).length);
+  const g = mainGroup(k), G = g && GROUPS[g];
+  const dur = d.start && d.end && d.end > d.start ? ' · ⏱ ' + fmtDur(d.end - d.start) : '';
+  return `${G ? `<div style="margin:2px 0 8px"><span class="cal-tag big" style="background:${G.col}">${G.ab}</span> <b>${esc(g)}-Tag</b><span class="muted small">${dur}</span></div>` : ''}` +
+    ents.map(e => `<div class="sess-ex">${icon(e.icon, 'ic')}<div class="grow"><div style="font-weight:600;color:var(--text)">${esc(e.name)}</div><div class="small t2">${esc(setsText(e.sets))}</div></div></div>`).join('');
+}
+
 /* ---- Progress ---- */
 const METRICS = { max: ['Max. Gewicht', 'kg'], orm: ['1RM (geschätzt)', 'kg'], reps: ['Max. Wdh.', 'Wdh.'], vol: ['Volumen', 'kg'] };
 function seriesFor(exId, metric) {
@@ -765,7 +835,17 @@ document.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-act]'); if (!el) return;
   const a = el.dataset.act;
   switch (a) {
-    case 'tab': S.tab = el.dataset.tab; if (S.tab === 'today') S.ex = null; render(); window.scrollTo(0, 0); break;
+    case 'tab': S.tab = el.dataset.tab; S.cal = null; if (S.tab === 'today') S.ex = null; render(); window.scrollTo(0, 0); break;
+    case 'cal-open': { const d = keyDate(S.day); S.cal = { y: d.getFullYear(), m: d.getMonth() }; render(); window.scrollTo(0, 0); break; }
+    case 'cal-close': S.cal = null; render(); break;
+    case 'cal-month': { let { y, m } = S.cal; m += +el.dataset.d; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } S.cal = { y, m }; render(); break; }
+    case 'cal-goto': S.day = el.dataset.k; S.cal = null; S.ex = null; render(); window.scrollTo(0, 0); break;
+    case 'cal-day': {
+      const k = el.dataset.k;
+      const go = await modal({ title: fmtKey(k, { weekday: 'long', day: '2-digit', month: 'long' }), body: daySummaryHTML(k), ok: 'Tag öffnen', cancel: 'Schließen' });
+      if (go) { S.day = k; S.cal = null; S.ex = null; render(); window.scrollTo(0, 0); }
+      break;
+    }
     case 'day': { const n = shiftKey(S.day, +el.dataset.d); if (n > todayKey()) return; S.day = n; render(); break; }
     case 'open-ex': S.ex = el.dataset.id; render(); window.scrollTo(0, 0);
       { const e = getEntry(S.day, S.ex); if (!e || !e.sets.length) { addSet(); } } break;
