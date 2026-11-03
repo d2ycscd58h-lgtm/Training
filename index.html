@@ -130,6 +130,10 @@
   .sets tr.tgt td{padding-top:6px}
   .sets tr.tgt + tr td{padding-top:0}
   .goal{font-size:12px;font-weight:600;color:var(--accent-strong);text-align:left;padding:0 2px;margin-bottom:-4px}
+  .goal.wu{color:var(--muted);font-weight:500}
+  .sets tr.wu input{opacity:.7;border-style:dashed}
+  .setno{width:30px;height:30px;border-radius:9px;font-weight:700;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+  .setno.is-wu{background:#c98500;border-color:#c98500;color:#fff}
   .goal.hit{color:var(--good-text)}
   .pr{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--good);border-radius:99px;padding:2px 7px;margin-left:6px;vertical-align:2px}
   .delta{font-weight:700}
@@ -432,7 +436,7 @@ const Store = {
     const run = () => {
       const day = S.days[k];
       const has = day && (day.run || day.entries.some(e => validSets(e.sets).length));
-      if (has) { const d = { kind: 'day', date: k, start: day.start || null, end: day.end || null, run: day.run || null, finished: day.finished || null, entries: day.entries.map(e => ({ exId: e.exId, name: e.name, icon: e.icon, sets: validSets(e.sets).map(s => s.m != null ? ({ m: s.m }) : ({ w: s.w ?? null, r: s.r ?? null })) })).filter(e => e.sets.length) }; this.queue(() => this.col().doc('d_' + k).set(d)); }
+      if (has) { const d = { kind: 'day', date: k, start: day.start || null, end: day.end || null, run: day.run || null, finished: day.finished || null, entries: day.entries.map(e => ({ exId: e.exId, name: e.name, icon: e.icon, sets: validSets(e.sets).map(s => s.m != null ? ({ m: s.m }) : ({ w: s.w ?? null, r: s.r ?? null, ...(s.wu ? { wu: true } : {}) })) })).filter(e => e.sets.length) }; this.queue(() => this.col().doc('d_' + k).set(d)); }
       else this.queue(() => this.col().doc('d_' + k).delete());
     };
     if (now) run(); else this.timers[k] = setTimeout(run, 800);
@@ -453,13 +457,15 @@ function previous(exId, beforeKey) {
   for (const k of keys) { const e = S.days[k].entries.find(x => x.exId === exId); if (e && validSets(e.sets).length) return { date: k, sets: validSets(e.sets) }; }
   return null;
 }
+const workSets = sets => validSets(sets).filter(s => !s.wu);
+const wuSets = sets => validSets(sets).filter(s => s.wu);
 function bestEver(exId, beforeKey) {
   let best = null;
   for (const k of Object.keys(S.days)) { if (k >= beforeKey) continue; const e = S.days[k].entries.find(x => x.exId === exId); if (!e) continue;
-    validSets(e.sets).forEach(s => { const v = e1rm(s.w, s.r) ?? (s.r || 0); if (best == null || v > best) best = v; }); }
+    workSets(e.sets).forEach(s => { const v = e1rm(s.w, s.r) ?? (s.r || 0); if (best == null || v > best) best = v; }); }
   return best;
 }
-const setsText = sets => validSets(sets).map(s => s.m != null ? fmtNum(s.m) + ' min' : (s.w != null ? fmtNum(s.w) + ' kg × ' : '') + (s.r ?? '–')).join(' · ');
+const setsText = sets => validSets(sets).map(s => s.m != null ? fmtNum(s.m) + ' min' : (s.w != null ? fmtNum(s.w) + ' kg × ' : '') + (s.r ?? '–') + (s.wu ? ' (A)' : '')).join(' · ');
 const clock = sec => { sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60; return (h ? h + ':' + pad(m) : m) + ':' + pad(x); };
 const hhmm = t => new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 const fmtDur = ms => { const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + pad(m % 60) + ' min'; };
@@ -490,10 +496,10 @@ function stopRun(k) {
 }
 setInterval(() => { document.querySelectorAll('[data-run]').forEach(el => { const r = runOf(el.dataset.run); if (r) el.textContent = clock((Date.now() - r.t0) / 1000); }); }, 1000);
 setInterval(() => { document.querySelectorAll('[data-timer]').forEach(el => { const t = timerInfo(el.dataset.timer); if (t && t.live) el.textContent = clock((Date.now() - t.start) / 1000); }); }, 1000);
-const topSet = sets => validSets(sets).reduce((b, s) => { const v = e1rm(s.w, s.r) ?? (s.r || 0) / 1000; return !b || v > b.v ? { ...s, v } : b; }, null);
-const volume = sets => validSets(sets).reduce((a, s) => a + (s.w || 0) * (s.r || 0), 0);
+const topSet = sets => (workSets(sets).length ? workSets(sets) : validSets(sets)).reduce((b, s) => { const v = e1rm(s.w, s.r) ?? (s.r || 0) / 1000; return !b || v > b.v ? { ...s, v } : b; }, null);
+const volume = sets => workSets(sets).reduce((a, s) => a + (s.w || 0) * (s.r || 0), 0);
 function suggestion(prev) {
-  const t = setTarget(prev.sets[0]); if (!t) return '';
+  const t = setTarget(workSets(prev.sets)[0]); if (!t) return '';
   return `<b>${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.</b> im 1. Satz <span class="small t2">– Ziele für jeden Satz stehen unten</span>`;
 }
 
@@ -559,8 +565,8 @@ function viewExercise() {
     h += `<div class="target small t2">Erstes Mal – trag einfach ein, was du schaffst. Beim nächsten Mal siehst du hier dein Ziel.</div>`;
   }
   const rows = sets.length ? sets : [];
-  h += `<div class="card" style="padding:10px 12px 12px"><table class="sets"><thead><tr><th>Satz</th><th>Gewicht (kg)</th><th>Wdh.</th><th></th></tr></thead><tbody id="set-rows">`;
-  rows.forEach((s, i) => { h += setRow(x.id, s, i, prev, best); });
+  h += `<div class="small muted" style="margin:0 4px 6px">Tipp: Tippe auf die Satznummer, um einen Satz als <b>Aufwärmsatz (A)</b> zu markieren.</div><div class="card" style="padding:10px 12px 12px"><table class="sets"><thead><tr><th>Satz</th><th>Gewicht (kg)</th><th>Wdh.</th><th></th></tr></thead><tbody id="set-rows">`;
+  rows.forEach((s, i) => { h += setRow(x.id, s, i, prev, best, rows); });
   h += `</tbody></table>
     <button class="btn primary block" data-act="add-set" style="margin-top:6px">+ Satz hinzufügen</button></div>`;
   const tot = validSets(sets);
@@ -604,16 +610,21 @@ function setTarget(p) {
   return { w, r: r + 1 };
 }
 const prevSetFor = (prev, i) => prev && prev.sets.length ? (prev.sets[i] || prev.sets[prev.sets.length - 1]) : null;
-function setRow(exId, s, i, prev, best) {
-  const p = prev && prev.sets[i];
-  const t = setTarget(prevSetFor(prev, i));
+function setRow(exId, s, i, prev, best, all) {
+  // Aufwärmsätze werden getrennt verglichen und bekommen kein Steigerungsziel
+  const before = (all || []).slice(0, i);
+  const wi = before.filter(x => !x.wu).length, ai = before.filter(x => x.wu).length;
+  const prevW = prev ? workSets(prev.sets) : [], prevA = prev ? wuSets(prev.sets) : [];
+  const p = s.wu ? prevA[ai] : prevW[wi];
+  const t = s.wu ? null : setTarget(prevW.length ? (prevW[wi] || prevW[prevW.length - 1]) : null);
   const cw = num(s.w), cr = num(s.r);
   const cur = e1rm(cw, cr), pv = p ? e1rm(p.w, p.r) : null;
-  const up = cur != null && pv != null && cur > pv + 1e-9;
-  const isPR = cur != null && best != null && cur > best + 1e-9;
+  const up = !s.wu && cur != null && pv != null && cur > pv + 1e-9;
+  const isPR = !s.wu && cur != null && best != null && cur > best + 1e-9;
   const hit = t && cr != null && ((cr >= t.r && (t.w == null || (cw != null && cw >= t.w - 1e-9))) || (t.w != null && cur != null && cur >= e1rm(t.w, t.r) - 1e-9));
-  const goal = t ? `<tr class="tgt"><td></td><td colspan="2"><div class="goal ${hit ? 'hit' : ''}" id="goal-${i}" data-tw="${t.w ?? ''}" data-tr="${t.r}" data-txt="${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.">${hit ? '✓ Ziel erreicht: ' : '🎯 Ziel: '}${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.</div></td><td></td></tr>` : '';
-  return goal + `<tr class="${up ? 'up' : ''}"><td class="n">${i + 1}</td>
+  const goal = t ? `<tr class="tgt"><td></td><td colspan="2"><div class="goal ${hit ? 'hit' : ''}" id="goal-${i}" data-tw="${t.w ?? ''}" data-tr="${t.r}" data-txt="${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.">${hit ? '✓ Ziel erreicht: ' : '🎯 Ziel: '}${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.</div></td><td></td></tr>`
+    : s.wu ? `<tr class="tgt"><td></td><td colspan="2"><div class="goal wu">Aufwärmsatz · zählt nicht für Ziele und Rekorde</div></td><td></td></tr>` : '';
+  return goal + `<tr class="${up ? 'up' : ''} ${s.wu ? 'wu' : ''}"><td class="n"><button class="setno ${s.wu ? 'is-wu' : ''}" data-act="toggle-wu" data-i="${i}" aria-label="${s.wu ? 'Aufwärmsatz – tippen für Arbeitssatz' : 'Satz ' + (wi + 1) + ' – tippen für Aufwärmsatz'}">${s.wu ? 'A' : wi + 1}</button></td>
     <td><input inputmode="decimal" data-in="w" data-i="${i}" value="${s.w != null ? String(s.w).replace('.', ',') : ''}" placeholder="${t && t.w != null ? fmtNum(t.w) : (p && p.w != null ? fmtNum(p.w) : '0')}">${p ? `<div class="prev">zuletzt ${p.w != null ? fmtNum(p.w) : '–'}</div>` : ''}</td>
     <td><input inputmode="numeric" data-in="r" data-i="${i}" value="${s.r ?? ''}" placeholder="${t ? t.r : (p && p.r != null ? p.r : '0')}">${p ? `<div class="prev">zuletzt ${p.r ?? '–'}${isPR ? '<span class="pr">Rekord</span>' : ''}</div>` : (isPR ? '<div class="prev"><span class="pr">Rekord</span></div>' : '')}</td>
     <td style="width:40px"><button class="icon-btn" data-act="del-set" data-i="${i}" aria-label="Satz löschen" style="width:34px">${SV.x}</button></td></tr>`;
@@ -711,7 +722,7 @@ function seriesFor(exId, metric) {
   const pts = [];
   Object.keys(S.days).sort().forEach(k => {
     const e = S.days[k].entries.find(x => x.exId === exId); if (!e) return;
-    const sets = validSets(e.sets); if (!sets.length) return;
+    const sets = validSets(e.sets).some(x => x.m != null) ? validSets(e.sets) : workSets(e.sets); if (!sets.length) return;
     let v = null;
     if (metric === 'max') v = Math.max(...sets.map(s => s.w ?? -Infinity));
     if (metric === 'orm') v = Math.max(...sets.map(s => e1rm(s.w, s.r) ?? -Infinity));
@@ -836,6 +847,7 @@ document.addEventListener('click', async ev => {
   const a = el.dataset.act;
   switch (a) {
     case 'tab': S.tab = el.dataset.tab; S.cal = null; if (S.tab === 'today') S.ex = null; render(); window.scrollTo(0, 0); break;
+    case 'toggle-wu': { const e = getEntry(S.day, S.ex, true), st = e.sets[+el.dataset.i]; if (!st) return; st.wu = !st.wu; if (!st.wu) delete st.wu; Store.saveDay(S.day); render(); toast(st.wu ? 'Als Aufwärmsatz markiert' : 'Wieder normaler Satz'); break; }
     case 'cal-open': { const d = keyDate(S.day); S.cal = { y: d.getFullYear(), m: d.getMonth() }; render(); window.scrollTo(0, 0); break; }
     case 'cal-close': S.cal = null; render(); break;
     case 'cal-month': { let { y, m } = S.cal; m += +el.dataset.d; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } S.cal = { y, m }; render(); break; }
@@ -934,7 +946,14 @@ function addSet(focus) {
   const prev = previous(S.ex, S.day);
   const pv = prev && prev.sets[e.sets.length];
   const tg = setTarget(prevSetFor(prev, e.sets.length));
-  e.sets.push({ w: last ? last.w : (tg && tg.w != null ? tg.w : (pv ? pv.w : null)), r: null });
+  const n = e.sets.length, prevWuCount = prev ? wuSets(prev.sets).length : 0;
+  if (prev && n < prevWuCount && e.sets.every(x => x.wu)) { const pw = wuSets(prev.sets)[n]; e.sets.push({ w: pw.w, r: null, wu: true }); }
+  else {
+    const prevW = prev ? workSets(prev.sets) : [], wi = e.sets.filter(x => !x.wu).length;
+    const t2 = setTarget(prevW.length ? (prevW[wi] || prevW[prevW.length - 1]) : null);
+    const lastWork = [...e.sets].reverse().find(x => !x.wu);
+    e.sets.push({ w: t2 && t2.w != null ? t2.w : (lastWork ? lastWork.w : (pv ? pv.w : null)), r: null });
+  }
   Store.saveCache(); render();
   if (focus !== false) setTimeout(() => { const inp = document.querySelector(`[data-in="r"][data-i="${e.sets.length - 1}"]`); inp && inp.focus(); }, 30);
 }
