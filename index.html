@@ -75,7 +75,9 @@
   .timerbar .tclock{color:var(--accent-strong);font-size:16px}
   .day button.lbl{background:none;border:0;padding:4px 0;border-radius:10px}
   .day button.lbl:active{background:var(--surface-2)}
-  .cal-ic{font-size:14px}
+  .cal-ic{display:inline-block;vertical-align:-4px;margin-left:2px}
+  .calsvg{display:inline-block;vertical-align:middle}
+  .small .calsvg{vertical-align:-3px}
   .cal{padding:10px}
   .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
   .cal-head div{text-align:center;font-size:11px;font-weight:600;color:var(--muted);padding:2px 0 6px}
@@ -87,6 +89,16 @@
   .cal-d{font-size:13px;font-weight:600;color:var(--text-2)}
   .cal-tag{display:inline-block;max-width:100%;padding:2px 4px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;text-align:center;line-height:1.3}
   .cal-tag.big{font-size:13px;padding:3px 7px}
+  .cal-tag.plan{background:transparent !important;border:2px dashed;padding:0 3px}
+  .cal-cell.planned{background:var(--surface)}
+  .cal-cell.missed{opacity:.5}
+  .cal-time{font-size:9px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .planrow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 0;border-top:1px solid var(--line);text-align:left;font-weight:600}
+  .planbanner{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px 14px;border-color:var(--accent);background:linear-gradient(var(--accent-soft),var(--accent-soft)),var(--surface)}
+  .planbanner.next{width:100%;border-color:var(--line);background:var(--surface)}
+  .chipwrap{display:flex;flex-wrap:wrap;gap:6px}
+  .chipsel{padding:8px 12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);font-weight:600;font-size:14px}
+  .chipsel.on{background:var(--accent);border-color:var(--accent);color:#fff}
   .cal-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:4px;font-size:13px;color:var(--text-2)}
   .cal-legend i{font-style:normal;display:inline-block;color:#fff;font-weight:800;font-size:11px;border-radius:5px;padding:1px 5px;margin-right:5px}
   .day .sub{display:block;font-size:12px;font-weight:500;color:var(--muted)}
@@ -102,6 +114,40 @@
   .tile .badge{position:absolute;top:6px;right:6px;background:var(--good);color:#fff;font-size:11px;font-weight:700;border-radius:99px;padding:2px 7px}
   .tile .last{font-size:11px;font-weight:600;color:var(--text-2);background:var(--surface-2);border-radius:99px;padding:2px 7px;font-variant-numeric:tabular-nums}
   .tile.done .last{background:var(--surface)}
+  .searchbox{margin:16px 0 0}
+  .searchbox input{height:46px;font-size:16px}
+  .cathead{display:flex;align-items:center;gap:10px;width:100%;padding:14px 4px;border-bottom:1px solid var(--line);font-weight:700;font-size:16px;text-align:left}
+  .cathead span:first-child{flex:1}
+  .cathead .chev{color:var(--muted)}
+  .cathead .okc{color:var(--good-text)}
+  .catgrid{margin:10px 0 6px}
+  .rcards{display:flex;gap:10px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
+  .rcards::-webkit-scrollbar{display:none}
+  .rcard{flex:none;width:138px;min-height:104px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left}
+  .rcard .rname{font-weight:700;font-size:15px;line-height:1.2;margin-top:4px}
+  .rcard.add{align-items:center;justify-content:center;border-style:dashed;color:var(--muted)}
+  .rcard.add .plus{font-size:28px;line-height:1}
+  .rcard:active,.rrow:active{transform:scale(.98)}
+  .rbox{margin-top:14px;padding:14px}
+  .rprog{font-size:14px;color:var(--muted)} .rprog b{font-size:22px;color:var(--text)}
+  .rbar{height:5px;border-radius:3px;background:var(--surface-3);margin:10px 0 6px;overflow:hidden}
+  .rbar i{display:block;height:100%;background:var(--good);border-radius:3px;transition:width .3s}
+  .rrow{display:flex;align-items:center;gap:10px;width:100%;padding:8px 2px;border-top:1px solid var(--line);text-align:left}
+  .rrow .ic,.rerow .ic{width:42px;height:42px;flex:none;color:var(--accent)}
+  .rrow .nm{display:block;font-weight:600;line-height:1.2}
+  .rrow .last{display:inline-block;margin-top:3px;font-size:11px;font-weight:600;color:var(--text-2);background:var(--surface-2);border-radius:99px;padding:1px 7px}
+  .rrow .rst{font-size:12px;font-weight:700;color:var(--good-text);white-space:nowrap}
+  .rrow.done .nm{color:var(--text-2)}
+  .rnum{width:24px;height:24px;flex:none;border-radius:50%;background:var(--surface-2);color:var(--muted);font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+  .rrow.done .rnum{background:var(--good);color:#fff}
+  .rerow{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+  .rerow:first-child{border-top:0}
+  .rerow .nm{font-weight:600;font-size:14px}
+  .rpromo{margin-top:14px}
+  .tile.pick.on{border-color:var(--accent);background:linear-gradient(var(--accent-soft),var(--accent-soft)),var(--surface)}
+  .tile.pick.on .badge{background:var(--accent)}
+  .pickdone{position:sticky;bottom:calc(76px + var(--safe-bottom));margin-top:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .nextbtn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:46px}
   .tile.add{justify-content:center;color:var(--muted);border-style:dashed}
   .tile.add .plus{font-size:30px;line-height:1}
 
@@ -319,6 +365,13 @@ const ICONS = {
     fig({ h:[34,21], s:[27,27], p:[19,43], legs:[[[36,34],[44,44]]], arms:[[[30,16],[24,22]]] }) +
     `<path class="eq" d="M52 40 Q56 30 50 22"/>` + EQ([48,26],[50,22],[54,25]),
   plank: ground() + fig({ h:[11,37], s:[17,42], p:[35,46], legs:[[[56,52]]], arms:[[[17,57],[27,57]]] }),
+  pushup: ground() + fig({ h:[11,31], s:[17,35], p:[36,43], legs:[[[46,48],[57,54]]], arms:[[[17,45],[17,56]]] }),
+  shrug: ground() + fig({ h:[32,13], s:[32,22], p:[32,40], legs:[[[28,49],[27,58]],[[36,49],[37,58]]], arms:[[[22,30],[21,40]],[[42,30],[43,40]]] }) + dbV(21, 45) + dbV(43, 45) +
+    EQ([12,22],[12,10]) + EQ([9,13],[12,10],[15,13]) + EQ([52,22],[52,10]) + EQ([49,13],[52,10],[55,13]),
+  hipthrust: ground() + EQ([3,40],[17,40]) + EQ([8,40],[8,58]) + fig({ h:[9,32], s:[16,37], p:[34,33], legs:[[[45,37],[47,57]]], arms:[[[22,30],[30,28]]] }) + plate(34, 25, 6),
+  skull: ground() + EQ([10,42],[48,42]) + EQ([14,42],[14,58]) + EQ([44,42],[44,58]) +
+    fig({ h:[11,33], s:[18,36], p:[38,37], legs:[[[47,30],[52,57]]], arms:[[[19,20],[10,23]]] }) + plate(9, 21, 6),
+  hanglegraise: EQ([10,5],[54,5]) + fig({ h:[26,17], s:[31,21], p:[31,40], legs:[[[44,40],[57,40]]], arms:[[[31,13],[32,5]]] }),
   generic: '',
 };
 ICONS.generic = `<g transform="translate(32 32) scale(2.4) translate(-32 -32)">${dbH(32, 32)}</g>`;
@@ -363,6 +416,84 @@ const BUILTIN = [
   { id: 'abmachine', name: 'Bauchmaschine', icon: 'abmachine', cat: 'Bauch' },
   { id: 'plank', name: 'Plank (Sekunden)', icon: 'plank', cat: 'Bauch' },
 ];
+
+// Erweiterte Übungsbibliothek (angelehnt an gängige Gym-Apps); Bilder teilweise von ähnlichen Übungen übernommen
+BUILTIN.push(
+  { id: 'benchdb', name: 'Bankdrücken Kurzhantel', icon: 'bench', cat: 'Brust' },
+  { id: 'inclinebb', name: 'Schrägbankdrücken Langhantel', icon: 'incline', cat: 'Brust' },
+  { id: 'inclinedb', name: 'Schrägbankdrücken Kurzhantel', icon: 'incline', cat: 'Brust' },
+  { id: 'declinebench', name: 'Negativ-Bankdrücken', icon: 'bench', cat: 'Brust' },
+  { id: 'smithbench', name: 'Bankdrücken Multipresse', icon: 'benchbb', cat: 'Brust' },
+  { id: 'chestpress', name: 'Brustpresse Maschine', icon: 'fly', cat: 'Brust' },
+  { id: 'inclinechestpress', name: 'Schräge Brustpresse Maschine', icon: 'fly', cat: 'Brust' },
+  { id: 'dbfly', name: 'Fliegende Kurzhantel', icon: 'fly', cat: 'Brust' },
+  { id: 'inclinedbfly', name: 'Schrägbank Fliegende', icon: 'fly', cat: 'Brust' },
+  { id: 'cablelowfly', name: 'Kabelzug Crossover von unten', icon: 'cablefly', cat: 'Brust' },
+  { id: 'pushup', name: 'Liegestütze', icon: 'pushup', cat: 'Brust' },
+  { id: 'pullover', name: 'Pullover Kurzhantel', icon: 'skull', cat: 'Brust' },
+  { id: 'dbrow', name: 'Kurzhantelrudern einarmig', icon: 'row', cat: 'Rücken' },
+  { id: 'tbarrow', name: 'T-Bar-Rudern', icon: 'row', cat: 'Rücken' },
+  { id: 'machinerow', name: 'Rudermaschine sitzend', icon: 'cablerow', cat: 'Rücken' },
+  { id: 'chinup', name: 'Klimmzüge Untergriff', icon: 'pullup', cat: 'Rücken' },
+  { id: 'assistpullup', name: 'Klimmzüge mit Unterstützung', icon: 'pullup', cat: 'Rücken' },
+  { id: 'latunder', name: 'Latzug Untergriff', icon: 'latnarrow', cat: 'Rücken' },
+  { id: 'latone', name: 'Latzug einarmig', icon: 'latnarrow', cat: 'Rücken' },
+  { id: 'straightarm', name: 'Überzüge am Kabel', icon: 'latpull', cat: 'Rücken' },
+  { id: 'shrug', name: 'Shrugs (Schulterheben)', icon: 'shrug', cat: 'Rücken' },
+  { id: 'rackpull', name: 'Rack Pulls', icon: 'deadlift', cat: 'Rücken' },
+  { id: 'goodmorning', name: 'Good Mornings', icon: 'deadlift', cat: 'Rücken' },
+  { id: 'arnold', name: 'Arnold Press', icon: 'ohpdb', cat: 'Schultern' },
+  { id: 'shoulderpress', name: 'Schulterpresse Maschine', icon: 'ohpdb', cat: 'Schultern' },
+  { id: 'smithohp', name: 'Schulterdrücken Multipresse', icon: 'ohp', cat: 'Schultern' },
+  { id: 'cablelateral', name: 'Seitheben am Kabel', icon: 'lateral', cat: 'Schultern' },
+  { id: 'machinelateral', name: 'Seitheben Maschine', icon: 'lateral', cat: 'Schultern' },
+  { id: 'reardelt', name: 'Vorgebeugtes Seitheben', icon: 'reversefly', cat: 'Schultern' },
+  { id: 'uprightrow', name: 'Aufrechtes Rudern', icon: 'shrug', cat: 'Schultern' },
+  { id: 'cablefront', name: 'Frontheben am Kabel', icon: 'frontraise', cat: 'Schultern' },
+  { id: 'hammercurl', name: 'Hammercurls', icon: 'curl', cat: 'Arme' },
+  { id: 'bbcurl', name: 'Langhantel-Curls', icon: 'ezcurl', cat: 'Arme' },
+  { id: 'cablecurl', name: 'Bizepscurls am Kabel', icon: 'curl', cat: 'Arme' },
+  { id: 'preacher', name: 'Scottcurls', icon: 'ezcurl', cat: 'Arme' },
+  { id: 'conccurl', name: 'Konzentrationscurls', icon: 'curl', cat: 'Arme' },
+  { id: 'inclinecurl', name: 'Schrägbank-Curls', icon: 'curl', cat: 'Arme' },
+  { id: 'machinecurl', name: 'Bizepsmaschine', icon: 'curl', cat: 'Arme' },
+  { id: 'ropepush', name: 'Trizepsdrücken mit Seil', icon: 'triceps', cat: 'Arme' },
+  { id: 'skull', name: 'French Press (SZ-Stange)', icon: 'skull', cat: 'Arme' },
+  { id: 'overheadtri', name: 'Trizeps über Kopf', icon: 'tricepsone', cat: 'Arme' },
+  { id: 'kickback', name: 'Trizeps Kickbacks', icon: 'row', cat: 'Arme' },
+  { id: 'closebench', name: 'Enges Bankdrücken', icon: 'benchbb', cat: 'Arme' },
+  { id: 'benchdip', name: 'Bankdips', icon: 'dips', cat: 'Arme' },
+  { id: 'tricepsmachine', name: 'Trizepsmaschine', icon: 'triceps', cat: 'Arme' },
+  { id: 'wristcurl', name: 'Unterarmcurls', icon: 'curl', cat: 'Arme' },
+  { id: 'frontsquat', name: 'Frontkniebeuge', icon: 'squat', cat: 'Beine' },
+  { id: 'smithsquat', name: 'Kniebeuge Multipresse', icon: 'squat', cat: 'Beine' },
+  { id: 'gobletsquat', name: 'Goblet Squat', icon: 'squat', cat: 'Beine' },
+  { id: 'hacksquat', name: 'Hackenschmidt', icon: 'legpress', cat: 'Beine' },
+  { id: 'bulgarian', name: 'Bulgarische Split-Kniebeuge', icon: 'lunge', cat: 'Beine' },
+  { id: 'walklunge', name: 'Ausfallschritte gehend', icon: 'lunge', cat: 'Beine' },
+  { id: 'stepup', name: 'Step-ups', icon: 'stepper', cat: 'Beine' },
+  { id: 'rdl', name: 'Rumänisches Kreuzheben', icon: 'deadlift', cat: 'Beine' },
+  { id: 'sumodl', name: 'Kreuzheben Sumo', icon: 'deadlift', cat: 'Beine' },
+  { id: 'seatedlegcurl', name: 'Beinbeuger sitzend', icon: 'legext', cat: 'Beine' },
+  { id: 'hipthrust', name: 'Hip Thrust', icon: 'hipthrust', cat: 'Beine' },
+  { id: 'glutebridge', name: 'Glute Bridge', icon: 'hipthrust', cat: 'Beine' },
+  { id: 'abductor', name: 'Abduktoren-Maschine', icon: 'legext', cat: 'Beine' },
+  { id: 'adductor', name: 'Adduktoren-Maschine', icon: 'legext', cat: 'Beine' },
+  { id: 'glutekick', name: 'Glute Kickback am Kabel', icon: 'lunge', cat: 'Beine' },
+  { id: 'presscalf', name: 'Wadenheben an der Beinpresse', icon: 'legpress', cat: 'Beine' },
+  { id: 'hanglegraise', name: 'Beinheben hängend', icon: 'hanglegraise', cat: 'Bauch' },
+  { id: 'cablecrunch', name: 'Kabel-Crunch', icon: 'crunch', cat: 'Bauch' },
+  { id: 'situp', name: 'Sit-ups', icon: 'crunch', cat: 'Bauch' },
+  { id: 'russiantwist', name: 'Russian Twist', icon: 'crunch', cat: 'Bauch' },
+  { id: 'bicyclecrunch', name: 'Fahrrad-Crunches', icon: 'crunch', cat: 'Bauch' },
+  { id: 'sideplank', name: 'Seitstütz (Sekunden)', icon: 'plank', cat: 'Bauch' },
+  { id: 'abroller', name: 'Bauchroller', icon: 'plank', cat: 'Bauch' },
+  { id: 'mountain', name: 'Mountain Climbers', icon: 'pushup', cat: 'Bauch' },
+  { id: 'crosstrainer', name: 'Crosstrainer', icon: 'stepper', cat: 'Aufwärmen', kind: 'cardio' },
+  { id: 'running', name: 'Laufen (draußen)', icon: 'treadmill', cat: 'Aufwärmen', kind: 'cardio' },
+  { id: 'jumprope', name: 'Seilspringen', icon: 'treadmill', cat: 'Aufwärmen', kind: 'cardio' },
+  { id: 'stretching', name: 'Dehnen / Mobility', icon: 'plank', cat: 'Aufwärmen', kind: 'cardio' },
+);
 const CATS = ['Aufwärmen', 'Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene'];
 
 /* ================= State & storage ================= */
@@ -370,7 +501,7 @@ const S = {
   custom: [],          // [{id,name,icon,cat}]
   hidden: [],          // ids of built-ins the user removed
   days: {},            // key -> {date, entries:[{exId,name,icon,sets:[{w,r}]}]}
-  tab: 'today', day: todayKey(), ex: null, cal: null,
+  tab: 'today', day: todayKey(), ex: null, cal: null, routines: [], plan: {}, q: '', pq: '', open: lsGet('tt_open') || {}, redit: null, pick: false,
   prog: { ex: null, metric: 'max' }, openDay: null,
 };
 const allExercises = () => [...BUILTIN.filter(b => !S.hidden.includes(b.id)), ...S.custom];
@@ -382,8 +513,8 @@ const isCardio = id => { const x = exById(id); return !!(x && x.kind === 'cardio
 const Store = {
   mode: 'local', db: null, uid: null, chain: Promise.resolve(), timers: {},
   setSync(state, text) { $('#sync').innerHTML = `<span class="dot ${state}"></span><span>${esc(text)}</span>`; },
-  loadCache() { const c = lsGet('tt_cache'); if (c) { S.custom = c.custom || []; S.hidden = c.hidden || []; S.days = c.days || {}; } },
-  saveCache() { lsSet('tt_cache', { custom: S.custom, hidden: S.hidden, days: S.days }); },
+  loadCache() { const c = lsGet('tt_cache'); if (c) { S.custom = c.custom || []; S.hidden = c.hidden || []; S.days = c.days || {}; S.routines = c.routines || []; S.plan = c.plan || {}; } },
+  saveCache() { lsSet('tt_cache', { custom: S.custom, hidden: S.hidden, days: S.days, routines: S.routines, plan: S.plan }); },
   col() { return this.db.collection('data/users/' + this.uid); },
   async init() {
     this.loadCache(); render();
@@ -406,7 +537,7 @@ const Store = {
       if (!setSnap.exists && !daySnap.docs.length && (S.custom.length || Object.keys(S.days).length)) {
         this.saveSettings(); Object.keys(S.days).forEach(k => this.saveDay(k, true));
       } else {
-        if (setSnap.exists) { const s = setSnap.data(); S.custom = JSON.parse(JSON.stringify(s.custom || [])); S.hidden = [...(s.hidden || [])]; }
+        if (setSnap.exists) { const s = setSnap.data(); S.custom = JSON.parse(JSON.stringify(s.custom || [])); S.hidden = [...(s.hidden || [])]; S.routines = JSON.parse(JSON.stringify(s.routines || [])); S.plan = JSON.parse(JSON.stringify(s.plan || {})); }
         // keep a local unsynced edit of today if cloud has nothing for it
         const keepLocal = S.days[todayKey()];
         S.days = cloudDays;
@@ -429,14 +560,14 @@ const Store = {
       this.setSync('', 'Nicht gespeichert');
     });
   },
-  saveSettings() { this.saveCache(); const d = { custom: JSON.parse(JSON.stringify(S.custom)), hidden: [...S.hidden] }; this.queue(() => this.col().doc('settings').set(d)); },
+  saveSettings() { this.saveCache(); const d = { custom: JSON.parse(JSON.stringify(S.custom)), hidden: [...S.hidden], routines: JSON.parse(JSON.stringify(S.routines)), plan: JSON.parse(JSON.stringify(S.plan)) }; this.queue(() => this.col().doc('settings').set(d)); },
   saveDay(k, now) {
     this.saveCache();
     clearTimeout(this.timers[k]);
     const run = () => {
       const day = S.days[k];
-      const has = day && (day.run || day.entries.some(e => validSets(e.sets).length));
-      if (has) { const d = { kind: 'day', date: k, start: day.start || null, end: day.end || null, run: day.run || null, finished: day.finished || null, entries: day.entries.map(e => ({ exId: e.exId, name: e.name, icon: e.icon, sets: validSets(e.sets).map(s => s.m != null ? ({ m: s.m }) : ({ w: s.w ?? null, r: s.r ?? null, ...(s.wu ? { wu: true } : {}) })) })).filter(e => e.sets.length) }; this.queue(() => this.col().doc('d_' + k).set(d)); }
+      const has = day && (day.run || day.routine || day.entries.some(e => validSets(e.sets).length));
+      if (has) { const d = { kind: 'day', date: k, start: day.start || null, end: day.end || null, run: day.run || null, finished: day.finished || null, routine: day.routine || null, entries: day.entries.map(e => ({ exId: e.exId, name: e.name, icon: e.icon, sets: validSets(e.sets).map(s => s.m != null ? ({ m: s.m }) : ({ w: s.w ?? null, r: s.r ?? null, ...(s.wu ? { wu: true } : {}) })) })).filter(e => e.sets.length) }; this.queue(() => this.col().doc('d_' + k).set(d)); }
       else this.queue(() => this.col().doc('d_' + k).delete());
     };
     if (now) run(); else this.timers[k] = setTimeout(run, 800);
@@ -513,33 +644,140 @@ function render() {
   $('#tabs').innerHTML = TABS.map(([k, l, i]) => `<button data-act="tab" data-tab="${k}" class="${S.tab === k ? 'on' : ''}">${i}${l}</button>`).join('');
   const hdr = { today: 'Training', history: 'Verlauf', progress: 'Fortschritt' }[S.tab];
   $('#hdr').textContent = S.tab === 'today' && S.ex ? '' : hdr;
+  if (S.tab === 'today' && S.redit) {
+    $('#hdr').innerHTML = S.pick ? `<button class="btn sm" data-act="pick-done" style="padding-left:6px">${SV.back} Routine</button>` : `<button class="btn sm" data-act="redit-done" style="padding-left:6px">${SV.back} Fertig</button>`;
+    $('#main').innerHTML = S.pick ? viewPicker() : viewRoutineEdit(); return;
+  }
   if (S.tab === 'today' && S.cal) { $('#hdr').innerHTML = `<button class="btn sm" data-act="cal-close" style="padding-left:6px">${SV.back} Training</button>`; $('#main').innerHTML = viewCalendar(); return; }
   $('#hdr').innerHTML = S.tab === 'today' && S.ex ? `<button class="btn sm" data-act="close-ex" style="padding-left:6px">${SV.back} Übungen</button>` : esc(hdr);
   $('#main').innerHTML = S.tab === 'today' ? (S.ex ? viewExercise() : viewToday()) : S.tab === 'history' ? viewHistory() : viewProgress();
   if (S.tab === 'progress') wireChart();
 }
 
+function tileHTML(x, k) {
+  const e = getEntry(k, x.id); const n = e ? validSets(e.sets).length : 0;
+  return `<button class="tile ${n ? 'done' : ''}" data-act="open-ex" data-id="${x.id}">${runOf(k) && runOf(k).exId === x.id ? '<span class="badge run">▶ läuft</span>' : n ? `<span class="badge">${x.kind === 'cardio' ? fmtNum(validSets(e.sets).reduce((a, s) => a + (s.m || 0), 0)) + ' min' : n + ' ' + (n === 1 ? 'Satz' : 'Sätze')}</span>` : ''}${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span>${lastLine(x.id, k)}</button>`;
+}
+const routineById = id => S.routines.find(r => r.id === id);
+function routineGroup(r) {
+  const cnt = {}; r.exIds.forEach(id => { const x = exById(id); if (x) cnt[x.cat] = (cnt[x.cat] || 0) + 1; });
+  const pri = ['Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene', 'Aufwärmen'];
+  let pool = ['Brust', 'Rücken', 'Beine', 'Schultern'].filter(c => cnt[c]); if (!pool.length) pool = pri.filter(c => cnt[c]);
+  return pool.sort((a, b) => cnt[b] - cnt[a] || pri.indexOf(a) - pri.indexOf(b))[0] || null;
+}
+function routineLastDone(r) { const k = sortedDayKeys().find(k => S.days[k].routine === r.id); return k || null; }
+function routinesHTML(k) {
+  const day = S.days[k], active = day && day.routine && routineById(day.routine);
+  if (active) {
+    const exs = active.exIds.map(exById).filter(Boolean);
+    const done = exs.filter(x => { const e = getEntry(k, x.id); return e && validSets(e.sets).length; }).length;
+    const G = GROUPS[routineGroup(active)];
+    return `<div class="card rbox"><div class="row between"><div class="grow"><div class="small muted">Heutige Routine</div>
+      <div class="title">${G ? `<span class="cal-tag" style="background:${G.col}">${G.ab}</span> ` : ''}${esc(active.name || 'Ohne Namen')}</div></div>
+      <div class="rprog"><b>${done}</b>/${exs.length}</div></div>
+      <div class="rbar"><i style="width:${exs.length ? done / exs.length * 100 : 0}%"></i></div>
+      ${exs.map((x, i) => { const e = getEntry(k, x.id), n = e ? validSets(e.sets).length : 0, run = runOf(k) && runOf(k).exId === x.id;
+        return `<button class="rrow ${n ? 'done' : ''}" data-act="open-ex" data-id="${x.id}"><span class="rnum">${n ? '✓' : i + 1}</span>${icon(x.icon, 'ic')}<span class="grow"><span class="nm">${esc(x.name)}</span>${lastLine(x.id, k)}</span>
+          <span class="rst">${run ? '▶ läuft' : n ? (x.kind === 'cardio' ? fmtNum(validSets(e.sets).reduce((a, s) => a + (s.m || 0), 0)) + ' min' : n + ' ' + (n === 1 ? 'Satz' : 'Sätze')) : ''}</span></button>`; }).join('')}
+      <div class="row" style="margin-top:10px"><button class="btn sm grow" data-act="routine-edit" data-id="${active.id}">Routine bearbeiten</button><button class="btn sm grow" data-act="routine-stop">Andere Routine</button></div></div>`;
+  }
+  if (!S.routines.length) return `<div class="card rpromo"><div class="title">Deine Trainingspläne</div><div class="small t2" style="margin:4px 0 10px">Lege Routinen an, z. B. „Brust-Tag“, „Rücken-Tag“ und „Bein-Tag“. Dann hast du beim Training nur deine Übungen in der richtigen Reihenfolge vor dir.</div>
+    <button class="btn primary block" data-act="routine-new">+ Routine anlegen</button></div>`;
+  return `<h2>Meine Routinen</h2><div class="rcards">${S.routines.map(r => { const G = GROUPS[routineGroup(r)], last = routineLastDone(r);
+      return `<button class="rcard" data-act="routine-tap" data-id="${r.id}">${G ? `<span class="cal-tag" style="background:${G.col}">${G.ab}</span>` : ''}<span class="rname">${esc(r.name || 'Ohne Namen')}</span><span class="small muted">${r.exIds.length} Übungen</span><span class="small muted">${last ? 'zuletzt ' + fmtKey(last, { day: '2-digit', month: '2-digit' }) : 'noch nie'}</span></button>`; }).join('')}
+    <button class="rcard add" data-act="routine-new"><span class="plus">+</span><span class="small">Neue Routine</span></button></div>`;
+}
+// Wie oft wurde eine Übung trainiert (Anzahl Tage) – häufige Übungen rutschen nach vorne
+function useCounts() {
+  const c = {};
+  Object.values(S.days).forEach(d => d.entries.forEach(e => { if (validSets(e.sets).length) c[e.exId] = (c[e.exId] || 0) + 1; }));
+  return c;
+}
+function sortByUse(items) { const c = useCounts(); return items.map((x, i) => [x, i]).sort((a, b) => (c[b[0].id] || 0) - (c[a[0].id] || 0) || a[1] - b[1]).map(a => a[0]); }
+function exListHTML(k) {
+  const q = norm(S.q), list = allExercises();
+  if (q) {
+    const hits = list.filter(x => norm(x.name).includes(q) || norm(x.cat).includes(q));
+    return hits.length ? `<div class="grid">${hits.map(x => tileHTML(x, k)).join('')}</div>`
+      : `<div class="empty small">Keine Übung „${esc(S.q)}“ gefunden.<br><button class="btn sm" data-act="new-ex" style="margin-top:10px">+ Als eigene Übung anlegen</button></div>`;
+  }
+  let h = '';
+  // zuletzt trainiert (letzte 21 Tage), schneller Zugriff
+  const recent = [], seen = new Set(), from = shiftKey(todayKey(), -21);
+  sortedDayKeys().filter(d => d >= from && d !== k).forEach(d => S.days[d].entries.forEach(e => { if (validSets(e.sets).length && !seen.has(e.exId) && exById(e.exId)) { seen.add(e.exId); recent.push(exById(e.exId)); } }));
+  if (recent.length) h += `<h2>Zuletzt trainiert</h2><div class="grid">${recent.slice(0, 12).map(x => tileHTML(x, k)).join('')}</div>`;
+  h += `<h2>Alle Übungen</h2>`;
+  CATS.forEach(cat => {
+    const items = sortByUse(list.filter(x => (x.cat || 'Eigene') === cat));
+    if (!items.length && cat !== 'Eigene') return;
+    const doneN = items.filter(x => { const e = getEntry(k, x.id); return e && validSets(e.sets).length; }).length;
+    const open = !!S.open[cat];
+    h += `<button class="cathead ${open ? 'open' : ''}" data-act="cat-toggle" data-cat="${esc(cat)}"><span>${cat === 'Eigene' ? 'Eigene Übungen' : cat}</span><span class="muted small">${items.length}${doneN ? ` · <b class="okc">${doneN} heute</b>` : ''}</span><span class="chev">${open ? SV.up : SV.down}</span></button>`;
+    if (open) {
+      h += `<div class="grid catgrid">${items.map(x => tileHTML(x, k)).join('')}`;
+      if (cat === 'Eigene') h += `<button class="tile add" data-act="new-ex"><span class="plus">+</span><span class="nm">Übung hinzufügen</span></button>`;
+      h += `</div>`;
+    }
+  });
+  return h;
+}
+const calIcon = (k, size = 22) => { const d = keyDate(k).getDate();
+  return `<svg class="calsvg" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="17.5" rx="3.5" fill="var(--surface-2)" stroke="var(--accent)" stroke-width="1.6"/><path d="M2.5 9.2h19" stroke="var(--accent)" stroke-width="1.6"/><rect x="2.5" y="4" width="19" height="5.2" rx="3" fill="var(--accent)"/><path d="M7.5 2.5v3.5M16.5 2.5v3.5" stroke="var(--text-2)" stroke-width="1.8" stroke-linecap="round"/><text x="12" y="18.6" text-anchor="middle" font-size="${d > 9 ? 9.5 : 10.5}" font-weight="800" fill="var(--text)" font-family="Inter,system-ui,sans-serif">${d}</text></svg>`; };
 function viewToday() {
   const k = S.day, day = S.days[k];
   const doneCount = day ? day.entries.filter(e => validSets(e.sets).length).length : 0;
   let h = `<div class="day"><button class="icon-btn" data-act="day" data-d="-1" aria-label="Vorheriger Tag">${SV.left}</button>
-    <button class="lbl" data-act="cal-open" aria-label="Monatsübersicht öffnen">${esc(relDay(k))} <span class="cal-ic">📅</span><span class="sub">${fmtKey(k, { day: '2-digit', month: 'long', year: 'numeric' })}${doneCount ? ' · ' + doneCount + (doneCount === 1 ? ' Übung' : ' Übungen') : ''}</span></button>
+    <button class="lbl" data-act="cal-open" aria-label="Monatsübersicht öffnen">${esc(relDay(k))} <span class="cal-ic">${calIcon(k)}</span><span class="sub">${fmtKey(k, { day: '2-digit', month: 'long', year: 'numeric' })}${doneCount ? ' · ' + doneCount + (doneCount === 1 ? ' Übung' : ' Übungen') : ''}</span></button>
     <button class="icon-btn" data-act="day" data-d="1" aria-label="Nächster Tag" ${k >= todayKey() ? 'disabled style="opacity:.3"' : ''}>${SV.right}</button></div>
     ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
-  const list = allExercises();
-  CATS.forEach(cat => {
-    const items = list.filter(x => (x.cat || 'Eigene') === cat);
-    if (!items.length && cat !== 'Eigene') return;
-    h += `<h2>${cat === 'Eigene' ? 'Eigene Übungen' : cat}</h2><div class="grid">`;
-    items.forEach(x => {
-      const e = getEntry(k, x.id); const n = e ? validSets(e.sets).length : 0;
-      h += `<button class="tile ${n ? 'done' : ''}" data-act="open-ex" data-id="${x.id}">${runOf(k) && runOf(k).exId === x.id ? '<span class="badge run">▶ läuft</span>' : n ? `<span class="badge">${x.kind === 'cardio' ? fmtNum(validSets(e.sets).reduce((a, s) => a + (s.m || 0), 0)) + ' min' : n + ' ' + (n === 1 ? 'Satz' : 'Sätze')}</span>` : ''}${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span>${lastLine(x.id, k)}</button>`;
-    });
-    if (cat === 'Eigene') h += `<button class="tile add" data-act="new-ex"><span class="plus">+</span><span class="nm">Übung hinzufügen</span></button>`;
-    h += `</div>`;
-  });
+  const P = S.plan[k], dayHas = day && (day.routine || doneCount);
+  if (P && !dayHas) h += `<div class="card planbanner"><div class="grow"><div class="small muted">${calIcon(k, 15)} ${k === todayKey() ? 'Heute' : 'Für diesen Tag'} geplant${P.t ? ' · ' + esc(P.t) + ' Uhr' : ''}</div><div class="title">${esc(planLabel(P))}</div></div>${P.r && routineById(P.r) ? '<button class="btn primary sm" data-act="plan-start">▶ Starten</button>' : ''}</div>`;
+  else if (k === todayKey() && !dayHas) { const nk = Object.keys(S.plan).filter(x => x > k).sort()[0];
+    if (nk) h += `<button class="card planbanner next" data-act="cal-open"><div class="grow" style="text-align:left"><div class="small muted">${calIcon(nk, 15)} Nächstes Training</div><div style="font-weight:700">${esc(planLabel(S.plan[nk]))} · ${fmtKey(nk, { weekday: 'short', day: '2-digit', month: '2-digit' })}${S.plan[nk].t ? ', ' + esc(S.plan[nk].t) : ''}</div></div><span class="muted">${SV.right}</span></button>`; }
+  h += routinesHTML(k);
+  h += `<div class="searchbox"><input id="exq" class="f" type="search" placeholder="🔍 Übung suchen (${allExercises().length} Übungen)" value="${esc(S.q)}" autocomplete="off" autocorrect="off"></div><div id="exlist">${exListHTML(k)}</div>`;
   return h;
 }
+
+function nextExButton(k, exId) {
+  const d = S.days[k], r = d && d.routine && routineById(d.routine);
+  if (r) { const i = r.exIds.indexOf(exId), rest = r.exIds.slice(i + 1).concat(r.exIds.slice(0, Math.max(i, 0)));
+    const nx = rest.map(exById).find(x => x && !(getEntry(k, x.id) && validSets(getEntry(k, x.id).sets).length));
+    if (nx) return `<div class="row" style="margin-top:16px"><button class="btn grow" data-act="close-ex">Übersicht</button><button class="btn primary grow nextbtn" data-act="open-ex" data-id="${nx.id}">Weiter: ${esc(nx.name)} →</button></div>`; }
+  return `<button class="btn block" data-act="close-ex" style="margin-top:16px">Fertig</button>`;
+}
+/* ---- Routine bearbeiten ---- */
+function viewRoutineEdit() {
+  const r = routineById(S.redit); if (!r) { S.redit = null; return viewToday(); }
+  let h = `<label class="lab" style="margin-top:4px">Name der Routine</label><input class="f" data-rin="name" value="${esc(r.name)}" placeholder="z. B. Brust-Tag" style="font-weight:700;font-size:18px;height:50px">`;
+  h += `<h2>${r.exIds.length} ${r.exIds.length === 1 ? 'Übung' : 'Übungen'} in dieser Reihenfolge</h2>`;
+  if (r.prefilled) h += `<div class="small muted" style="margin:-4px 0 8px">Übernommen aus deinem heutigen Training – passe sie einfach an.</div>`;
+  h += `<div class="card" style="padding:6px 10px">${r.exIds.length ? r.exIds.map((id, i) => { const x = exById(id); if (!x) return '';
+      return `<div class="rerow"><span class="rnum">${i + 1}</span>${icon(x.icon, 'ic')}<span class="grow nm">${esc(x.name)}</span>
+        <button class="icon-btn" data-act="r-move" data-i="${i}" data-d="-1" aria-label="Nach oben" ${i === 0 ? 'disabled style="opacity:.25"' : ''}>${SV.up}</button>
+        <button class="icon-btn" data-act="r-move" data-i="${i}" data-d="1" aria-label="Nach unten" ${i === r.exIds.length - 1 ? 'disabled style="opacity:.25"' : ''}>${SV.down}</button>
+        <button class="icon-btn" data-act="r-del" data-i="${i}" aria-label="Entfernen">${SV.x}</button></div>`; }).join('')
+    : '<div class="empty small">Noch keine Übungen.</div>'}</div>
+    <button class="btn primary block" data-act="pick-open">+ Übungen hinzufügen</button>
+    <div class="row" style="margin-top:12px"><button class="btn grow" data-act="redit-done">Fertig</button><button class="btn danger" data-act="r-remove">Löschen</button></div>`;
+  return h;
+}
+function pickListHTML() {
+  const r = routineById(S.redit), q = norm(S.pq), list = allExercises();
+  const tile = x => { const on = r.exIds.includes(x.id);
+    return `<button class="tile pick ${on ? 'on' : ''}" data-act="pick-toggle" data-id="${x.id}">${on ? `<span class="badge">${r.exIds.indexOf(x.id) + 1}.</span>` : ''}${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span></button>`; };
+  if (q) { const hits = list.filter(x => norm(x.name).includes(q) || norm(x.cat).includes(q)); return hits.length ? `<div class="grid">${hits.map(tile).join('')}</div>` : '<div class="empty small">Nichts gefunden.</div>'; }
+  return CATS.map(cat => { const items = sortByUse(list.filter(x => (x.cat || 'Eigene') === cat)); return items.length ? `<h2>${cat === 'Eigene' ? 'Eigene Übungen' : cat}</h2><div class="grid">${items.map(tile).join('')}</div>` : ''; }).join('');
+}
+function viewPicker() {
+  const r = routineById(S.redit);
+  return `<div class="small muted" style="margin-bottom:8px">Tippe Übungen an, um sie zu „${esc(r.name || 'Routine')}“ hinzuzufügen. Die Nummer zeigt die Reihenfolge.</div>
+    <div class="searchbox" style="position:sticky;top:0;z-index:4;background:var(--bg);padding:6px 0"><input id="pickq" class="f" type="search" placeholder="🔍 Übung suchen" value="${esc(S.pq)}" autocomplete="off"></div>
+    <div id="picklist">${pickListHTML()}</div>
+    <button class="btn primary block pickdone" data-act="pick-done">Fertig (${r.exIds.length} ausgewählt)</button>`;
+}
+let routineSaveT = null;
+const saveRoutinesSoon = () => { Store.saveCache(); clearTimeout(routineSaveT); routineSaveT = setTimeout(() => Store.saveSettings(), 700); };
 
 function lastLine(exId, k) {
   const p = previous(exId, k); if (!p) return '';
@@ -575,7 +813,7 @@ function viewExercise() {
     h += `<div class="row small t2" style="justify-content:space-between;padding:0 4px"><span>${tot.length} ${tot.length === 1 ? 'Satz' : 'Sätze'} · Volumen ${fmtNum(vol)} kg</span>
       ${pvol ? (vol > pvol ? `<span class="delta up">▲ ${fmtNum(vol - pvol)} kg mehr als letztes Mal</span>` : `<span class="muted">letztes Mal ${fmtNum(pvol)} kg</span>`) : ''}</div>`;
   }
-  h += `<button class="btn block" data-act="close-ex" style="margin-top:16px">Fertig</button>`;
+  h += nextExButton(k, x.id);
   return h;
 }
 function viewCardio(x, k, sets, prev) {
@@ -596,7 +834,7 @@ function viewCardio(x, k, sets, prev) {
   h += `<div class="card" style="padding:12px 16px"><table class="sets"><thead><tr><th>Dauer heute (Minuten)</th></tr></thead><tbody><tr>
     <td><input inputmode="decimal" data-in="m" data-i="0" value="${s0.m != null ? String(s0.m).replace('.', ',') : ''}" placeholder="${pm != null ? fmtNum(pm) : '–'}">${prev ? `<div class="prev">zuletzt ${fmtNum(pm)} min</div>` : ''}</td>
     </tr></tbody></table><div class="small muted" style="text-align:center;margin-top:4px">Wird bei „Stopp“ automatisch ausgefüllt, du kannst es aber auch selbst eintragen.</div></div>
-    <button class="btn block" data-act="close-ex" style="margin-top:12px">Fertig</button>`;
+    ${nextExButton(k, x.id)}`;
   return h;
 }
 // Zielvorgabe pro Satz aus dem letzten Training (doppelte Progression):
@@ -638,7 +876,7 @@ function viewHistory() {
     <div class="card" style="margin:0;padding:12px"><div style="font-size:24px;font-weight:800">${wk}</div><div class="small muted">Diese Woche</div></div>
     <div class="card" style="margin:0;padding:12px"><div style="font-size:24px;font-weight:800">${m30}</div><div class="small muted">Letzte 30 Tage</div></div>
     <div class="card" style="margin:0;padding:12px"><div style="font-size:24px;font-weight:800">${keys.length}</div><div class="small muted">Gesamt</div></div></div>`;
-  if (!keys.length) h += `<div class="empty"><div class="big">📅</div>Hier erscheinen deine Trainingstage.</div>`;
+  if (!keys.length) h += `<div class="empty"><div class="big">${calIcon(todayKey(), 44)}</div>Hier erscheinen deine Trainingstage.</div>`;
   let month = '';
   keys.forEach(k => {
     const mo = keyDate(k).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
@@ -688,26 +926,98 @@ function viewCalendar() {
   const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
   const lead = (first.getDay() + 6) % 7, today = todayKey();
   const title = first.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-  const stats = {}; let total = 0;
+  const stats = {}; let total = 0, planned = 0;
   let cells = '';
   for (let i = 0; i < lead; i++) cells += '<div class="cal-cell empty"></div>';
   for (let d = 1; d <= days; d++) {
     const k = `${y}-${pad(m + 1)}-${pad(d)}`, g = mainGroup(k);
     if (g) { stats[g] = (stats[g] || 0) + 1; total++; }
-    const G = g && GROUPS[g];
-    cells += `<button class="cal-cell ${k === today ? 'today' : ''} ${g ? 'has' : ''}" ${g ? `data-act="cal-day" data-k="${k}"` : (k <= today ? `data-act="cal-goto" data-k="${k}"` : 'disabled')}>
-      <span class="cal-d">${d}</span>${G ? `<span class="cal-tag" style="background:${G.col}">${G.ab}</span>` : ''}</button>`;
+    const G = g && GROUPS[g], P = !g && S.plan[k], PG = P && GROUPS[planGroup(P)];
+    if (P && k >= today) planned++;
+    cells += `<button class="cal-cell ${k === today ? 'today' : ''} ${g ? 'has' : ''} ${P ? 'planned' : ''} ${P && k < today ? 'missed' : ''}" data-act="${g ? 'cal-day' : P ? 'plan-tap' : k < today ? 'cal-goto' : 'plan-new'}" data-k="${k}">
+      <span class="cal-d">${d}</span>${G ? `<span class="cal-tag" style="background:${G.col}">${G.ab}</span>` : P ? `<span class="cal-tag plan" style="border-color:${PG ? PG.col : 'var(--muted)'};color:${PG ? PG.col : 'var(--muted)'}">${PG ? PG.ab : '•'}</span><span class="cal-time">${esc(P.t || '')}</span>` : ''}</button>`;
   }
-  const next = new Date(y, m + 1, 1) > new Date();
+  const next = new Date(y, m + 1, 1) > new Date(new Date().getFullYear() + 1, new Date().getMonth(), 1);
+  const upcoming = Object.keys(S.plan).filter(k => k >= today && !mainGroup(k)).sort();
   return `<div class="day"><button class="icon-btn" data-act="cal-month" data-d="-1" aria-label="Vormonat">${SV.left}</button>
-      <div class="lbl" style="cursor:default">${esc(title)}<span class="sub">${total} ${total === 1 ? 'Trainingstag' : 'Trainingstage'}</span></div>
+      <div class="lbl" style="cursor:default">${esc(title)}<span class="sub">${total} ${total === 1 ? 'Trainingstag' : 'Trainingstage'}${planned ? ' · ' + planned + ' geplant' : ''}</span></div>
       <button class="icon-btn" data-act="cal-month" data-d="1" aria-label="Nächster Monat" ${next ? 'disabled style="opacity:.3"' : ''}>${SV.right}</button></div>
     <div class="card cal" style="margin-top:12px">
       <div class="cal-grid cal-head">${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(w => `<div>${w}</div>`).join('')}</div>
       <div class="cal-grid">${cells}</div></div>
     ${total ? `<div class="cal-legend">${Object.keys(GROUPS).filter(g => stats[g]).map(g => `<span><i style="background:${GROUPS[g].col}">${GROUPS[g].ab}</i>${esc(g)} <b>${stats[g]}×</b></span>`).join('')}</div>` : '<div class="empty small">In diesem Monat noch kein Training eingetragen.</div>'}
-    <div class="small muted" style="margin-top:10px">Tippe auf einen Tag, um zu sehen, was du trainiert hast. Das Kürzel zeigt die Hauptmuskelgruppe, also die mit den meisten Sätzen.</div>`;
+    <div class="small muted" style="margin-top:10px">Tippe auf einen vergangenen Tag, um zu sehen, was du trainiert hast. <b>Tippe auf einen zukünftigen Tag, um ein Training zu planen.</b> Umrandete Kürzel sind geplant.</div>
+    ${upcoming.length ? `<div class="card" style="margin-top:14px"><div class="title" style="font-size:15px">Geplante Trainings (${upcoming.length})</div>
+      ${upcoming.slice(0, 6).map(k => { const P = S.plan[k], PG = GROUPS[planGroup(P)]; return `<button class="planrow" data-act="plan-tap" data-k="${k}"><span class="cal-tag plan" style="border-color:${PG ? PG.col : 'var(--muted)'};color:${PG ? PG.col : 'var(--muted)'}">${PG ? PG.ab : '•'}</span><span class="grow">${esc(planLabel(P))}</span><span class="small muted">${fmtKey(k, { weekday: 'short', day: '2-digit', month: '2-digit' })} · ${esc(P.t || '')}</span></button>`; }).join('')}
+      ${calExportButtons(upcoming.length)}</div>` : ''}`;
 }
+/* ---- Trainings planen ---- */
+const PLAN_GROUPS = ['Brust', 'Rücken', 'Beine', 'Schultern', 'Arme'];
+function planGroup(P) { if (!P) return null; const r = P.r && routineById(P.r); return r ? routineGroup(r) : (P.g || null); }
+function planLabel(P) { const r = P.r && routineById(P.r); return r ? (r.name || 'Routine') : P.g ? P.g + '-Tag' : 'Training'; }
+const REMIND = [[0, 'Keine'], [15, '15 min vorher'], [30, '30 min vorher'], [60, '1 Std. vorher'], [120, '2 Std. vorher']];
+function planForm(k, P) {
+  P = P || { r: S.routines[0] ? S.routines[0].id : null, g: S.routines[0] ? null : 'Brust', t: lsGet('tt_lastTime') || '18:00', a: lsGet('tt_lastRemind') ?? 60 };
+  const opts = S.routines.map(r => `<button type="button" class="chipsel ${P.r === r.id ? 'on' : ''}" data-pv="r:${r.id}">${esc(r.name || 'Routine')}</button>`).join('') +
+    PLAN_GROUPS.map(g => `<button type="button" class="chipsel ${!P.r && P.g === g ? 'on' : ''}" data-pv="g:${g}">${g}</button>`).join('');
+  return `<div class="small muted">${fmtKey(k, { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}</div>
+    <label class="lab">Was trainierst du?</label><div class="chipwrap" id="pf-what">${opts}</div>
+    <div class="row" style="gap:10px"><div class="grow"><label class="lab">Uhrzeit</label><input class="f" type="time" id="pf-time" value="${esc(P.t || '18:00')}"></div>
+    <div class="grow"><label class="lab">Erinnerung</label><select class="f" id="pf-alarm">${REMIND.map(([v, l]) => `<option value="${v}" ${+P.a === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>
+    <label class="lab">Wiederholen</label><select class="f" id="pf-rep"><option value="0">Nur dieser Tag</option><option value="4">Jede Woche, 4 Wochen</option><option value="8">Jede Woche, 8 Wochen</option><option value="12">Jede Woche, 12 Wochen</option></select>
+    <input type="hidden" id="pf-sel" value="${P.r ? 'r:' + P.r : 'g:' + (P.g || 'Brust')}">`;
+}
+function wirePlanForm(bg) {
+  bg.querySelector('#pf-what').addEventListener('click', e => { const b = e.target.closest('[data-pv]'); if (!b) return; e.stopPropagation();
+    bg.querySelectorAll('[data-pv]').forEach(x => x.classList.toggle('on', x === b)); bg.querySelector('#pf-sel').value = b.dataset.pv; });
+}
+async function editPlan(k, existing) {
+  let form = null;
+  const ok = await modal({ title: existing ? 'Geplantes Training ändern' : 'Training planen', body: planForm(k, existing), ok: 'Speichern',
+    onOpen: bg => { wirePlanForm(bg); bg.addEventListener('click', e => { if (e.target.closest('[data-r="1"]')) form = { sel: bg.querySelector('#pf-sel').value, t: bg.querySelector('#pf-time').value || '18:00', a: +bg.querySelector('#pf-alarm').value, rep: +bg.querySelector('#pf-rep').value }; }, true); } });
+  if (!ok || !form) return false;
+  const [type, val] = [form.sel.slice(0, 1), form.sel.slice(2)];
+  const P = { r: type === 'r' ? val : null, g: type === 'g' ? val : null, t: form.t, a: form.a, id: existing && existing.id || 'p_' + uid() };
+  lsSet('tt_lastTime', form.t); lsSet('tt_lastRemind', form.a);
+  const n = Math.max(1, form.rep);
+  for (let i = 0; i < n; i++) { const kk = shiftKey(k, i * 7); S.plan[kk] = i === 0 ? P : { ...P, id: 'p_' + uid() }; }
+  Store.saveSettings();
+  toast(n > 1 ? `${n} Trainings geplant` : 'Training geplant');
+  return true;
+}
+
+/* ---- Export in den iPhone-Kalender (.ics mit Erinnerung) ---- */
+function icsText(keys) {
+  const esc2 = t => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const ev = keys.map(k => { const P = S.plan[k], [hh, mm] = (P.t || '18:00').split(':'), r = P.r && routineById(P.r);
+    const start = k.replace(/-/g, '') + 'T' + pad(+hh) + pad(+mm) + '00';
+    const end = new Date(keyDate(k).getTime()); end.setHours(+hh, +mm + 90);
+    const endS = dayKey(end).replace(/-/g, '') + 'T' + pad(end.getHours()) + pad(end.getMinutes()) + '00';
+    const desc = r ? 'Übungen: ' + r.exIds.map(exById).filter(Boolean).map(x => x.name).join(', ') : 'Geplant in deiner Trainings-App';
+    return ['BEGIN:VEVENT', 'UID:' + (P.id || k) + '@trainingstagebuch', 'DTSTAMP:' + stamp, 'DTSTART;TZID=Europe/Berlin:' + start, 'DTEND;TZID=Europe/Berlin:' + endS,
+      'SUMMARY:' + esc2('🏋️ ' + planLabel(P)), 'DESCRIPTION:' + esc2(desc),
+      ...(P.a ? ['BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + esc2('Training: ' + planLabel(P)), 'TRIGGER:-PT' + P.a + 'M', 'END:VALARM'] : []), 'END:VEVENT'].join('\r\n'); });
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Trainingstagebuch//DE', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VTIMEZONE', 'TZID:Europe/Berlin', 'BEGIN:STANDARD', 'DTSTART:19701025T030000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0100', 'END:STANDARD',
+    'BEGIN:DAYLIGHT', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'END:DAYLIGHT', 'END:VTIMEZONE',
+    ...ev, 'END:VCALENDAR'].join('\r\n');
+}
+function calExportButtons(n) {
+  if (!STANDALONE) return `<div class="small muted" style="margin-top:10px">📲 Die Übernahme in den iPhone-Kalender geht in der App auf deinem Startbildschirm.</div>`;
+  return `<button class="btn primary block" data-act="ics-all" style="margin-top:10px">📲 ${n === 1 ? 'Training' : 'Alle ' + n + ' Trainings'} in iPhone-Kalender</button>`;
+}
+async function exportICS(keys) {
+  if (!keys.length) { toast('Keine geplanten Trainings'); return; }
+  const name = keys.length === 1 ? 'Training-' + keys[0] + '.ics' : 'Trainingsplan.ics';
+  const blob = new Blob([icsText(keys)], { type: 'text/calendar;charset=utf-8' });
+  try {
+    const file = new File([blob], name, { type: 'text/calendar' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Trainingsplan' }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+
 function daySummaryHTML(k) {
   const d = S.days[k]; const ents = d.entries.filter(e => validSets(e.sets).length);
   const g = mainGroup(k), G = g && GROUPS[g];
@@ -825,7 +1135,7 @@ function exerciseDialog(existing) {
   const body = `<label class="lab">Name</label><input class="f" id="m-name" value="${esc(existing ? existing.name : '')}" placeholder="z. B. Hammercurls">
     <label class="lab">Bild auswählen</label><div class="icon-pick" id="m-icons">${keys.map(k => `<button type="button" data-ic="${k}" class="${k === pick ? 'on' : ''}">${icon(k)}</button>`).join('')}</div>`;
   return new Promise(res => {
-    modal({ title: existing ? 'Übung bearbeiten' : 'Neue Übung', body, ok: 'Speichern', onOpen: bg => {
+    modal({ title: existing && !existing._new ? 'Übung bearbeiten' : 'Neue Übung', body, ok: 'Speichern', onOpen: bg => {
       bg.querySelector('#m-icons').addEventListener('click', e => { const b = e.target.closest('[data-ic]'); if (!b) return; e.stopPropagation(); pick = b.dataset.ic; bg.querySelectorAll('[data-ic]').forEach(x => x.classList.toggle('on', x === b)); });
       const n = bg.querySelector('#m-name'); n.addEventListener('input', () => { window.__mname = n.value; }); window.__mname = n.value;
       if (!existing) setTimeout(() => n.focus(), 50);
@@ -846,8 +1156,29 @@ document.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-act]'); if (!el) return;
   const a = el.dataset.act;
   switch (a) {
-    case 'tab': S.tab = el.dataset.tab; S.cal = null; if (S.tab === 'today') S.ex = null; render(); window.scrollTo(0, 0); break;
+    case 'tab': S.tab = el.dataset.tab; S.cal = null; S.redit = null; S.pick = false; if (S.tab === 'today') S.ex = null; render(); window.scrollTo(0, 0); break;
     case 'toggle-wu': { const e = getEntry(S.day, S.ex, true), st = e.sets[+el.dataset.i]; if (!st) return; st.wu = !st.wu; if (!st.wu) delete st.wu; Store.saveDay(S.day); render(); toast(st.wu ? 'Als Aufwärmsatz markiert' : 'Wieder normaler Satz'); break; }
+    case 'plan-new': { if (await editPlan(el.dataset.k)) render(); break; }
+    case 'plan-tap': {
+      const k = el.dataset.k, P = S.plan[k]; if (!P) return;
+      const r = P.r && routineById(P.r);
+      const list = r ? r.exIds.map(exById).filter(Boolean).map(x => `<div class="rerow" style="padding:4px 0">${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span></div>`).join('') : '';
+      const isToday = k === todayKey();
+      const choice = await new Promise(res => modal({ title: planLabel(P), ok: '', cancel: 'Schließen',
+        body: `<div class="small muted">${fmtKey(k, { weekday: 'long', day: '2-digit', month: 'long' })} · ${esc(P.t || '')} Uhr${P.a ? ' · Erinnerung ' + (REMIND.find(x => x[0] === +P.a) || [0, ''])[1] : ''}</div>
+          ${list ? `<div style="max-height:34vh;overflow:auto;margin:8px 0">${list}</div>` : ''}
+          <div style="display:grid;gap:8px;margin-top:10px">${isToday ? '<button class="btn primary block" data-ch="start">▶ Jetzt starten</button>' : ''}
+          ${STANDALONE ? '<button class="btn block" data-ch="ics">📲 In iPhone-Kalender</button>' : ''}
+          <button class="btn block" data-ch="edit">Ändern</button><button class="btn block danger" data-ch="del">Plan löschen</button></div>`,
+        onOpen: bg => bg.addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { bg.remove(); res(b.dataset.ch); } }) }).then(() => res(null)));
+      if (choice === 'edit') { if (await editPlan(k, P)) render(); }
+      if (choice === 'del') { delete S.plan[k]; Store.saveSettings(); render(); toast('Plan gelöscht'); }
+      if (choice === 'ics') exportICS([k]);
+      if (choice === 'start') { startPlanned(k); }
+      break;
+    }
+    case 'ics-all': exportICS(Object.keys(S.plan).filter(k => k >= todayKey() && !mainGroup(k)).sort()); break;
+    case 'plan-start': startPlanned(S.day); break;
     case 'cal-open': { const d = keyDate(S.day); S.cal = { y: d.getFullYear(), m: d.getMonth() }; render(); window.scrollTo(0, 0); break; }
     case 'cal-close': S.cal = null; render(); break;
     case 'cal-month': { let { y, m } = S.cal; m += +el.dataset.d; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } S.cal = { y, m }; render(); break; }
@@ -859,6 +1190,34 @@ document.addEventListener('click', async ev => {
       break;
     }
     case 'day': { const n = shiftKey(S.day, +el.dataset.d); if (n > todayKey()) return; S.day = n; render(); break; }
+    case 'cat-toggle': { const c = el.dataset.cat; S.open[c] = !S.open[c]; lsSet('tt_open', S.open); $('#exlist').innerHTML = exListHTML(S.day); break; }
+    case 'routine-new': {
+      const day = S.days[S.day], ids = day ? day.entries.filter(e => validSets(e.sets).length && exById(e.exId)).map(e => e.exId) : [];
+      const r = { id: 'r_' + uid(), name: '', exIds: ids }; S.routines.push(r); saveRoutinesSoon();
+      S.redit = r.id; r.prefilled = ids.length > 0; S.pick = !ids.length; S.pq = ''; render(); window.scrollTo(0, 0);
+      if (!ids.length) toast('Wähle die Übungen für deine Routine'); break;
+    }
+    case 'routine-tap': {
+      const r = routineById(el.dataset.id); if (!r) return;
+      const list = r.exIds.map(exById).filter(Boolean).map((x, i) => `<div class="rerow" style="padding:5px 0"><span class="rnum">${i + 1}</span>${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span></div>`).join('');
+      const choice = await new Promise(res => modal({ title: r.name || 'Routine', ok: '', cancel: 'Schließen',
+        body: `<div style="max-height:46vh;overflow:auto;margin:6px 0 4px">${list || 'Keine Übungen'}</div><div style="display:grid;gap:8px;margin-top:10px"><button class="btn primary block" data-ch="start">▶ Routine starten</button><button class="btn block" data-ch="edit">Bearbeiten</button></div>`,
+        onOpen: bg => bg.addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (b) { bg.remove(); res(b.dataset.ch); } }) }).then(() => res(null)));
+      if (choice === 'start') { if (!S.days[S.day]) S.days[S.day] = { date: S.day, entries: [] }; S.days[S.day].routine = r.id; Store.saveDay(S.day, true); render(); window.scrollTo(0, 0); toast((r.name || 'Routine') + ' gestartet'); }
+      if (choice === 'edit') { S.redit = r.id; S.pick = false; render(); window.scrollTo(0, 0); }
+      break;
+    }
+    case 'routine-edit': S.redit = el.dataset.id; S.pick = false; render(); window.scrollTo(0, 0); break;
+    case 'routine-stop': { const d = S.days[S.day]; if (d) { d.routine = null; Store.saveDay(S.day, true); } render(); break; }
+    case 'redit-done': { const r = routineById(S.redit); if (r) { delete r.prefilled; if (!r.name.trim()) r.name = (routineGroup(r) || 'Neue') + '-Tag'; } S.redit = null; S.pick = false; Store.saveSettings(); render(); window.scrollTo(0, 0); break; }
+    case 'pick-open': S.pick = true; S.pq = ''; render(); window.scrollTo(0, 0); break;
+    case 'pick-done': S.pick = false; saveRoutinesSoon(); render(); window.scrollTo(0, 0); break;
+    case 'pick-toggle': { const r = routineById(S.redit), id = el.dataset.id, i = r.exIds.indexOf(id); if (i >= 0) r.exIds.splice(i, 1); else r.exIds.push(id); saveRoutinesSoon();
+      $('#picklist').innerHTML = pickListHTML(); const d = document.querySelector('.pickdone'); if (d) d.textContent = `Fertig (${r.exIds.length} ausgewählt)`; break; }
+    case 'r-move': { const r = routineById(S.redit), i = +el.dataset.i, j = i + +el.dataset.d; if (j < 0 || j >= r.exIds.length) return; [r.exIds[i], r.exIds[j]] = [r.exIds[j], r.exIds[i]]; saveRoutinesSoon(); render(); break; }
+    case 'r-del': { const r = routineById(S.redit); r.exIds.splice(+el.dataset.i, 1); saveRoutinesSoon(); render(); break; }
+    case 'r-remove': { const r = routineById(S.redit); if (!await modal({ title: 'Routine löschen?', body: esc(r.name || 'Ohne Namen') + ' – deine bisherigen Trainings bleiben erhalten.', ok: 'Löschen', danger: true })) return;
+      S.routines = S.routines.filter(x => x.id !== r.id); Object.values(S.days).forEach(d => { if (d.routine === r.id && d.date === todayKey()) d.routine = null; }); S.redit = null; Store.saveSettings(); render(); break; }
     case 'open-ex': S.ex = el.dataset.id; render(); window.scrollTo(0, 0);
       { const e = getEntry(S.day, S.ex); if (!e || !e.sets.length) { addSet(); } } break;
     case 'finish-day': {
@@ -878,7 +1237,7 @@ document.addEventListener('click', async ev => {
     case 'close-ex': S.ex = null; render(); window.scrollTo(0, 0); break;
     case 'add-set': addSet(true); break;
     case 'del-set': { const e = getEntry(S.day, S.ex); if (!e) return; e.sets.splice(+el.dataset.i, 1); Store.saveDay(S.day); render(); break; }
-    case 'new-ex': { const r = await exerciseDialog(); if (!r) return; const x = { id: 'c_' + uid(), name: r.name, icon: r.icon, cat: 'Eigene' }; S.custom.push(x); Store.saveSettings(); render(); toast('Übung hinzugefügt'); break; }
+    case 'new-ex': { const r = await exerciseDialog(S.q ? { name: S.q.trim(), icon: 'generic', _new: true } : undefined); if (!r) return; const x = { id: 'c_' + uid(), name: r.name, icon: r.icon, cat: 'Eigene' }; S.custom.push(x); Store.saveSettings(); render(); toast('Übung hinzugefügt'); break; }
     case 'ex-menu': {
       const x = exById(S.ex), custom = x.cat === 'Eigene' || S.custom.includes(x);
       const choice = await new Promise(res => modal({ title: x.name, ok: '', cancel: 'Schließen',
@@ -927,18 +1286,25 @@ document.addEventListener('click', async ev => {
     }
   }
 });
-function backupText() { return JSON.stringify({ app: 'trainingstagebuch', v: 1, custom: S.custom, hidden: S.hidden, days: S.days }); }
+function backupText() { return JSON.stringify({ app: 'trainingstagebuch', v: 1, custom: S.custom, hidden: S.hidden, routines: S.routines, plan: S.plan, days: S.days }); }
 function lastBackupText() { const t = lsGet('tt_lastBackup'); if (!t) return 'Noch kein Backup gesichert.'; const d = Math.floor((Date.now() - t) / 864e5); return 'Letztes Backup: ' + (d === 0 ? 'heute' : d === 1 ? 'gestern' : 'vor ' + d + ' Tagen'); }
 function importBackup(v) {
   try {
     const d = JSON.parse(v); if (!d || typeof d.days !== 'object') throw 0;
     let n = 0;
     (d.custom || []).forEach(c => { if (c && c.id && !S.custom.some(x => x.id === c.id)) S.custom.push(c); });
+    Object.entries(d.plan || {}).forEach(([k, v]) => { if (/^\d{4}-\d\d-\d\d$/.test(k) && v && !S.plan[k]) S.plan[k] = v; });
+    (d.routines || []).forEach(r => { if (r && r.id && Array.isArray(r.exIds) && !S.routines.some(x => x.id === r.id)) S.routines.push(r); });
     Object.entries(d.days).forEach(([k, day]) => { if (/^\d{4}-\d\d-\d\d$/.test(k) && day && Array.isArray(day.entries) && !S.days[k]) { S.days[k] = { date: k, entries: day.entries, start: day.start || null, end: day.end || null }; Store.saveDay(k, true); n++; } });
     Store.saveSettings(); render(); toast(`${n} Trainingstage importiert`);
   } catch (e) { toast('Das ist kein gültiges Backup.'); }
 }
 function unlockAudioSafe() {}
+function startPlanned(k) {
+  const P = S.plan[k]; S.cal = null; S.day = k; S.ex = null;
+  if (P && P.r && routineById(P.r)) { if (!S.days[k]) S.days[k] = { date: k, entries: [] }; S.days[k].routine = P.r; Store.saveDay(k, true); toast(planLabel(P) + ' gestartet'); }
+  render(); window.scrollTo(0, 0);
+}
 function addSet(focus) {
   const e = getEntry(S.day, S.ex, true);
   if (isCardio(S.ex)) { if (!e.sets.length) e.sets.push({ m: null }); Store.saveCache(); render(); return; }
@@ -958,6 +1324,9 @@ function addSet(focus) {
   if (focus !== false) setTimeout(() => { const inp = document.querySelector(`[data-in="r"][data-i="${e.sets.length - 1}"]`); inp && inp.focus(); }, 30);
 }
 document.addEventListener('input', ev => {
+  if (ev.target.id === 'exq') { S.q = ev.target.value; $('#exlist').innerHTML = exListHTML(S.day); return; }
+  if (ev.target.id === 'pickq') { S.pq = ev.target.value; $('#picklist').innerHTML = pickListHTML(); return; }
+  if (ev.target.dataset.rin === 'name') { const r = routineById(S.redit); if (r) { r.name = ev.target.value; saveRoutinesSoon(); } return; }
   const el = ev.target; if (!el.dataset.in || !S.ex) return;
   const e = getEntry(S.day, S.ex, true), s = e.sets[+el.dataset.i]; if (!s) return;
   s[el.dataset.in] = num(el.value);
