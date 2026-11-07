@@ -148,6 +148,14 @@
   .tile.pick.on .badge{background:var(--accent)}
   .pickdone{position:sticky;bottom:calc(76px + var(--safe-bottom));margin-top:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
   .nextbtn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;line-height:46px}
+  .info-btn{width:30px;height:30px;flex:none;border-radius:50%;border:2px solid var(--accent);color:var(--accent);font-weight:800;font-family:Georgia,serif;font-style:italic;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+  .info-btn:active{background:var(--accent-soft)}
+  .info-bg{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:24px;animation:fadein .15s ease}
+  .info-card{position:relative;width:100%;max-width:340px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 18px;box-shadow:0 16px 40px rgba(0,0,0,.4)}
+  .info-x{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:var(--surface-2);color:var(--text-2);display:inline-flex;align-items:center;justify-content:center}
+  .info-ic{width:46px;height:46px;flex:none;color:var(--accent)}
+  .info-txt{font-size:15px;line-height:1.45}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
   .tile.add{justify-content:center;color:var(--muted);border-style:dashed}
   .tile.add .plus{font-size:30px;line-height:1}
 
@@ -375,6 +383,100 @@ const ICONS = {
   generic: '',
 };
 ICONS.generic = `<g transform="translate(32 32) scale(2.4) translate(-32 -32)">${dbH(32, 32)}</g>`;
+
+// ---- Eigene Bilder für jede Übung (Varianten über Gerät, Haltung und Bewegung) ----
+const ARR = (x1, y1, x2, y2) => { const a = Math.atan2(y2 - y1, x2 - x1), l = 4.5; const r = v => Math.round(v * 10) / 10;
+  return EQ([x1, y1], [x2, y2]) + EQ([r(x2 - l * Math.cos(a - .6)), r(y2 - l * Math.sin(a - .6))], [x2, y2], [r(x2 - l * Math.cos(a + .6)), r(y2 - l * Math.sin(a + .6))]); };
+const RAILS = (a, b) => EQ([a, 3], [a, 58]) + EQ([b, 3], [b, 58]);
+const PUL = (x, y) => `<circle class="eq" cx="${x}" cy="${y}" r="2.5"/>`;
+const TOWER = x => `<rect class="eqf" x="${x}" y="4" width="5" height="54" rx="1.5" opacity=".55"/>`;
+const BENCH = (x1, x2, y) => EQ([x1, y], [x2, y]) + EQ([x1 + 4, y], [x1 + 4, 58]) + EQ([x2 - 4, y], [x2 - 4, 58]);
+const PAD = (x, y, w, h) => `<rect class="eqf" x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/>`;
+const BARL = y => `<line class="eq" x1="3" y1="${y}" x2="61" y2="${y}"/><rect class="eqf" x="5" y="${y - 9}" width="5" height="18" rx="1.5"/><rect class="eqf" x="54" y="${y - 9}" width="5" height="18" rx="1.5"/>`;
+const SEAT = () => EQ([12, 46], [30, 46]) + EQ([20, 46], [20, 58]) + EQ([13, 46], [11, 20]);
+Object.assign(ICONS, {
+  benchdb: ground() + BENCH(10, 48, 42) + fig({ h:[11,33], s:[18,36], p:[38,37], legs:[[[47,30],[52,57]]], arms:[[[19,26],[20,16]]] }) + dbH(20, 13),
+  declinebench: ground() + EQ([12,34],[50,44]) + EQ([16,35],[16,58]) + EQ([46,43],[46,58]) + fig({ h:[52,40], s:[45,40], p:[24,34], legs:[[[14,40],[10,57]]], arms:[[[45,29],[45,18]]] }) + barH(32, 58, 16),
+  smithbench: ICONS.benchbb + EQ([1,3],[1,58]) + EQ([63,3],[63,58]),
+  closebench: ground() + BENCH(12, 52, 46) + BARL(16) + P([22,42],[42,42]) + P([22,42],[24,30],[28,16]) + P([42,42],[40,30],[36,16]) + head(32, 36),
+  inclinebb: ground() + `<path class="eqf" d="M23 46 L41 46 L38 18 L26 18 Z" opacity=".55"/>` + BARL(9) + P([22,33],[42,33]) + P([22,33],[17,22],[20,9]) + P([42,33],[47,22],[44,9]) + P([32,33],[32,46]) + P([27,46],[22,58]) + P([37,46],[42,58]) + head(32, 26),
+  inclinedb: ground() + EQ([20,50],[40,50]) + EQ([16,24],[30,50]) + EQ([30,50],[30,58]) + fig({ h:[18,19], s:[22,27], p:[33,46], legs:[[[45,40],[47,57]]], arms:[[[29,21],[31,10]]] }) + dbH(31, 8),
+  chestpress: ground() + SEAT() + TOWER(54) + fig({ h:[19,13], s:[18,22], p:[19,44], legs:[[[33,44],[34,57]]], arms:[[[28,26],[40,24]]] }) + EQ([41,17],[41,31]) + EQ([41,24],[54,24]),
+  inclinechestpress: ground() + SEAT() + TOWER(54) + fig({ h:[19,13], s:[18,22], p:[19,44], legs:[[[33,44],[34,57]]], arms:[[[28,21],[38,12]]] }) + EQ([35,8],[42,16]) + EQ([39,12],[54,12]),
+  dbfly: ground() + BENCH(14, 50, 46) + P([22,42],[42,42]) + P([22,42],[12,34],[6,27]) + P([42,42],[52,34],[58,27]) + head(32, 36) + dbV(6, 24) + dbV(58, 24),
+  inclinedbfly: ground() + `<path class="eqf" d="M23 46 L41 46 L38 18 L26 18 Z" opacity=".55"/>` + P([22,33],[42,33]) + P([22,33],[12,27],[7,19]) + P([42,33],[52,27],[57,19]) + P([32,33],[32,46]) + P([27,46],[22,58]) + P([37,46],[42,58]) + head(32, 26) + dbV(7, 16) + dbV(57, 16),
+  cablelowfly: ground() + TOWER(2) + TOWER(57) + PUL(9, 52) + PUL(55, 52) + EQ([9,52],[29,27]) + EQ([55,52],[35,27]) +
+    fig({ h:[32,11], s:[32,20], p:[32,40], legs:[[[28,49],[26,58]],[[36,49],[38,58]]], arms:[[[23,30],[29,27]],[[41,30],[35,27]]] }),
+  mountain: ground() + fig({ h:[11,31], s:[17,35], p:[35,41], legs:[[[46,48],[57,55]],[[28,48],[24,51]]], arms:[[[17,45],[17,56]]] }) + ARR(36, 30, 26, 30),
+  pullover: ground() + BENCH(14, 50, 42) + fig({ h:[17,33], s:[23,36], p:[42,37], legs:[[[50,30],[54,57]]], arms:[[[14,30],[5,25]]] }) + dbV(4, 22) + `<path class="eq" d="M8 12 Q20 6 26 18"/>` + EQ([22,17],[26,18],[27,14]),
+  dbrow: ground() + BENCH(4, 30, 40) + fig({ h:[9,26], s:[16,30], p:[35,32], legs:[[[29,40],[22,40]],[[42,46],[44,57]]], arms:[[[16,40]],[[24,24],[26,33]]] }) + dbH(26, 36),
+  tbarrow: ground() + EQ([61,57],[33,42]) + plate(46, 48, 5) + fig({ h:[49,21], s:[42,26], p:[22,35], legs:[[[31,45],[28,57]]], arms:[[[36,36],[35,42]]] }),
+  kickback: ground() + fig({ h:[49,21], s:[42,26], p:[22,35], legs:[[[31,45],[28,57]]], arms:[[[37,36],[25,31]]] }) + dbV(23, 31),
+  machinerow: ground() + SEAT() + PAD(34, 22, 5, 18) + TOWER(54) + fig({ h:[23,13], s:[22,22], p:[20,44], legs:[[[34,46],[36,57]]], arms:[[[13,29],[28,27]]] }) + EQ([28,21],[28,33]) + EQ([28,27],[54,27]),
+  chinup: EQ([6,7],[58,7]) + fig({ h:[32,19], s:[32,27], p:[32,45], legs:[[[28,53],[32,58]],[[36,53],[32,58]]], arms:[[[24,20],[28,7]],[[40,20],[36,7]]] }),
+  assistpullup: EQ([6,7],[58,7]) + EQ([16,52],[48,52]) + EQ([32,52],[32,58]) + fig({ h:[32,19], s:[32,27], p:[32,44], legs:[[[30,51],[40,52]]], arms:[[[17,22],[19,7]],[[47,22],[45,7]]] }) + ARR(52, 44, 52, 34),
+  latunder: EQ([32,1],[32,8]) + EQ([18,8],[46,8]) + EQ([20,46],[44,46]) + fig({ h:[32,20], s:[32,28], p:[32,44], legs:[[[22,46],[22,58]],[[42,46],[42,58]]], arms:[[[22,26],[24,8]],[[42,26],[40,8]]] }) + `<circle class="eqf" cx="24" cy="10" r="2"/><circle class="eqf" cx="40" cy="10" r="2"/>`,
+  latone: EQ([40,1],[40,7]) + EQ([37,8],[43,8]) + EQ([20,46],[44,46]) + fig({ h:[30,20], s:[32,28], p:[32,44], legs:[[[22,46],[22,58]],[[42,46],[42,58]]], arms:[[[44,20],[40,9]],[[22,34],[22,42]]] }),
+  straightarm: ground() + TOWER(56) + PUL(54, 8) + EQ([54,8],[38,38]) + fig({ h:[25,11], s:[24,19], p:[24,38], legs:[[[24,48],[23,58]],[[28,48],[31,58]]], arms:[[[38,38]]] }) + EQ([36,38],[40,38]),
+  uprightrow: ground() + fig({ h:[32,10], s:[32,20], p:[32,40], legs:[[[28,49],[27,58]],[[36,49],[37,58]]], arms:[[[18,15],[28,25]],[[46,15],[36,25]]] }) + barH(14, 50, 25),
+  rackpull: ground() + EQ([30,44],[30,58]) + EQ([26,44],[34,44]) + fig({ h:[43,14], s:[37,21], p:[25,35], legs:[[[34,45],[30,57]]], arms:[[[37,31],[36,38]]] }) + plate(36, 40),
+  goodmorning: ground() + fig({ h:[49,27], s:[42,30], p:[24,31], legs:[[[25,44],[25,57]]], arms:[[[35,24],[38,27]]] }) + plate(40, 24, 6),
+  rdl: ground() + fig({ h:[47,23], s:[41,27], p:[24,31], legs:[[[26,44],[26,57]]], arms:[[[40,38],[39,45]]] }) + plate(39, 48, 6),
+  sumodl: ground() + fig({ h:[32,16], s:[32,24], p:[32,40], legs:[[[20,46],[14,57]],[[44,46],[50,57]]], arms:[[[28,36],[28,47]],[[36,36],[36,47]]] }) + BARL(48),
+  arnold: ground() + EQ([20,44],[44,44]) + EQ([32,44],[32,58]) + fig({ h:[32,18], s:[32,26], p:[32,42], legs:[[[22,44],[22,58]],[[42,44],[42,58]]], arms:[[[18,24],[17,11]],[[44,34],[40,24]]] }) + dbH(17, 9) + dbH(40, 22) +
+    `<path class="eq" d="M48 18 Q56 10 50 4"/>` + EQ([47,6],[50,4],[52,7]),
+  shoulderpress: ground() + EQ([8,6],[8,58]) + EQ([56,6],[56,58]) + EQ([8,6],[56,6]) + EQ([20,44],[44,44]) + EQ([32,44],[32,58]) +
+    fig({ h:[32,18], s:[32,26], p:[32,42], legs:[[[22,44],[22,58]],[[42,44],[42,58]]], arms:[[[18,24],[17,12]],[[46,24],[47,12]]] }) + EQ([12,12],[22,12]) + EQ([42,12],[52,12]),
+  smithohp: ICONS.ohp + EQ([3,3],[3,58]) + EQ([61,3],[61,58]),
+  cablelateral: ground() + TOWER(56) + PUL(54, 54) + EQ([54,54],[10,22]) + fig({ h:[32,11], s:[32,20], p:[32,40], legs:[[[28,49],[27,58]],[[36,49],[37,58]]], arms:[[[20,22],[10,22]],[[42,30],[43,40]]] }),
+  machinelateral: ground() + EQ([20,44],[44,44]) + EQ([32,44],[32,58]) + EQ([12,8],[12,44]) + EQ([52,8],[52,44]) +
+    fig({ h:[32,18], s:[32,26], p:[32,42], legs:[[[22,44],[22,58]],[[42,44],[42,58]]], arms:[[[19,26],[12,28]],[[45,26],[52,28]]] }) + PAD(14, 20, 7, 5) + PAD(43, 20, 7, 5) + ARR(6, 30, 6, 20) + ARR(58, 30, 58, 20),
+  reardelt: ground() + fig({ h:[49,22], s:[42,27], p:[24,34], legs:[[[28,46],[27,57]]], arms:[[[38,20],[34,14]]] }) + dbV(33, 11) + ARR(26, 20, 30, 12),
+  cablefront: ground() + PUL(20, 55) + EQ([20,55],[47,18]) + fig({ h:[24,10], s:[24,18], p:[24,37], legs:[[[25,47],[24,58]]], arms:[[[36,18],[48,18]]] }) + EQ([48,14],[48,22]),
+  hammercurl: ground() + fig({ h:[32,10], s:[32,18], p:[32,38], legs:[[[28,48],[27,58]],[[36,48],[37,58]]], arms:[[[22,30],[21,20]],[[42,30],[43,40]]] }) + dbV(21, 17) + dbV(43, 44),
+  cablecurl: ground() + PUL(50, 55) + EQ([50,55],[41,22]) + fig({ h:[30,10], s:[30,18], p:[30,37], legs:[[[30,47],[30,58]]], arms:[[[31,30],[41,21]]] }) + EQ([38,21],[44,21]),
+  conccurl: ground() + BENCH(4, 28, 44) + fig({ h:[36,17], s:[30,24], p:[18,42], legs:[[[34,44],[36,57]]], arms:[[[33,38],[40,30]]] }) + dbV(41, 27),
+  inclinecurl: ground() + EQ([12,46],[26,16]) + EQ([22,48],[42,48]) + EQ([30,48],[30,58]) + fig({ h:[24,13], s:[22,21], p:[30,45], legs:[[[42,45],[44,57]]], arms:[[[20,34],[28,30]]] }) + dbV(29, 27),
+  machinecurl: ground() + EQ([12,46],[28,46]) + EQ([20,46],[20,58]) + PAD(30, 30, 16, 5) + EQ([44,34],[48,58]) + fig({ h:[22,14], s:[22,22], p:[20,44], legs:[[[33,46],[34,57]]], arms:[[[36,32],[40,18]]] }) + EQ([36,17],[44,17]),
+  wristcurl: ground() + BENCH(6, 30, 42) + fig({ h:[24,10], s:[22,18], p:[18,40], legs:[[[36,40],[38,57]]], arms:[[[30,36],[44,38]]] }) + dbV(46, 36) + `<path class="eq" d="M52 30 Q56 36 52 42"/>`,
+  bbcurl: ground() + BARL(23) + fig({ h:[32,10], s:[32,17], p:[32,38], legs:[[[28,48],[27,58]],[[36,48],[37,58]]], arms:[[[22,31],[21,23]],[[42,31],[43,23]]] }),
+  preacher: ground() + EQ([12,46],[26,46]) + EQ([18,46],[18,58]) + `<path class="eqf" d="M28 28 L44 40 L42 43 L26 31 Z"/>` + EQ([36,38],[36,58]) +
+    fig({ h:[20,14], s:[20,22], p:[19,44], legs:[[[33,46],[34,57]]], arms:[[[38,34],[46,22]]] }) + EQ([42,20],[50,20]),
+  ropepush: ground() + `<circle class="eq" cx="46" cy="6" r="3"/>` + EQ([46,9],[39,34]) + EQ([39,34],[35,41]) + EQ([39,34],[43,41]) +
+    fig({ h:[28,10], s:[28,18], p:[28,37], legs:[[[28,47],[28,58]]], arms:[[[30,30],[38,41]]] }),
+  tricepsmachine: ground() + SEAT() + EQ([46,10],[46,58]) + PAD(28, 26, 10, 4) + fig({ h:[19,13], s:[18,22], p:[19,44], legs:[[[33,44],[34,57]]], arms:[[[32,28],[38,40]]] }) + EQ([36,40],[46,40]),
+  overheadtri: ground() + fig({ h:[28,15], s:[29,23], p:[29,40], legs:[[[29,49],[29,58]]], arms:[[[33,6],[22,10]]] }) + dbV(20, 10),
+  benchdip: ground() + BENCH(2, 22, 34) + fig({ h:[26,14], s:[25,22], p:[27,40], legs:[[[42,42],[52,57]]], arms:[[[19,28],[18,34]]] }),
+  frontsquat: ground() + fig({ h:[33,13], s:[30,21], p:[24,40], legs:[[[39,44],[32,57]]], arms:[[[38,25],[42,21]]] }) + plate(41, 20),
+  smithsquat: ground() + EQ([10,3],[10,58]) + EQ([52,3],[52,58]) + fig({ h:[34,13], s:[30,21], p:[24,40], legs:[[[39,44],[32,57]]], arms:[[[40,25],[33,19]]] }) + EQ([6,19],[56,19]),
+  gobletsquat: ground() + fig({ h:[33,13], s:[30,21], p:[24,40], legs:[[[39,44],[32,57]]], arms:[[[38,32],[37,26]]] }) + dbV(37, 25),
+  hacksquat: ground() + EQ([12,8],[28,44]) + PAD(12, 16, 9, 4) + EQ([34,56],[58,50]) + fig({ h:[19,12], s:[21,20], p:[28,40], legs:[[[42,36],[44,52]]], arms:[[[17,26],[16,18]]] }),
+  presscalf: ground() + EQ([10,52],[18,28]) + EQ([12,52],[28,52]) + EQ([44,14],[56,34]) + fig({ h:[16,21], s:[19,29], p:[23,48], legs:[[[36,36],[48,26]]], arms:[[[24,38],[28,47]]] }) + ARR(52, 34, 58, 26),
+  bulgarian: ground() + BENCH(2, 18, 42) + fig({ h:[33,12], s:[33,20], p:[31,37], legs:[[[42,44],[43,57]],[[23,48],[14,42]]], arms:[[[34,29],[34,37]]] }) + dbV(34, 42),
+  walklunge: ground() + fig({ h:[32,13], s:[32,21], p:[31,39], legs:[[[45,43],[46,57]],[[22,52],[13,56]]], arms:[[[38,28],[42,34]],[[26,28],[22,33]]] }) + ARR(46, 8, 58, 8) + EQ([40,8],[43,8]),
+  glutekick: ground() + TOWER(1) + PUL(8, 52) + EQ([46,22],[46,58]) + fig({ h:[40,15], s:[36,23], p:[26,35], legs:[[[29,46],[29,57]],[[15,40],[8,34]]], arms:[[[42,26],[46,24]]] }) + EQ([8,52],[8,35]),
+  stepup: ground() + `<rect class="eq" x="30" y="44" width="24" height="14" rx="2"/>` + fig({ h:[37,8], s:[37,16], p:[36,32], legs:[[[45,37],[44,44]],[[32,45],[27,57]]], arms:[[[38,24],[38,31]]] }) + dbV(38, 35),
+  crosstrainer: EQ([6,56],[50,56]) + `<circle class="eq" cx="52" cy="47" r="7"/>` + EQ([42,18],[48,48]) + EQ([22,52],[30,52]) +
+    fig({ h:[28,8], s:[28,16], p:[28,32], legs:[[[34,42],[38,50]],[[24,42],[20,51]]], arms:[[[35,24],[43,19]]] }),
+  seatedlegcurl: ground() + EQ([14,44],[34,44]) + EQ([14,44],[12,18]) + EQ([24,44],[24,58]) + PAD(28, 36, 12, 4) +
+    fig({ h:[19,15], s:[18,23], p:[21,41], legs:[[[37,42],[32,55]]], arms:[[[22,33],[27,41]]] }) + `<circle class="eq" cx="28" cy="56" r="3"/>`,
+  abductor: ground() + EQ([22,42],[42,42]) + EQ([32,42],[32,58]) + fig({ h:[32,14], s:[32,22], p:[32,40], legs:[[[18,44],[15,56]],[[46,44],[49,56]]], arms:[[[24,32],[23,40]],[[40,32],[41,40]]] }) +
+    PAD(9, 42, 4, 10) + PAD(51, 42, 4, 10) + ARR(10, 30, 3, 30) + ARR(54, 30, 61, 30),
+  adductor: ground() + EQ([22,42],[42,42]) + EQ([32,42],[32,58]) + fig({ h:[32,14], s:[32,22], p:[32,40], legs:[[[18,44],[15,56]],[[46,44],[49,56]]], arms:[[[24,32],[23,40]],[[40,32],[41,40]]] }) +
+    PAD(19, 44, 4, 10) + PAD(41, 44, 4, 10) + ARR(3, 30, 11, 30) + ARR(61, 30, 53, 30),
+  glutebridge: ground() + fig({ h:[8,52], s:[15,53], p:[32,38], legs:[[[43,41],[47,57]]], arms:[[[22,57],[29,57]]] }) + ARR(32, 30, 32, 22),
+  cablecrunch: ground() + TOWER(56) + PUL(52, 8) + EQ([52,8],[22,32]) + fig({ h:[18,40], s:[24,36], p:[35,40], legs:[[[35,56],[46,57]]], arms:[[[26,30],[21,32]]] }),
+  situp: ground() + fig({ h:[19,17], s:[21,25], p:[27,52], legs:[[[40,38],[48,57]]], arms:[[[29,32],[38,34]]] }),
+  russiantwist: ground() + fig({ h:[18,22], s:[22,30], p:[31,49], legs:[[[42,40],[53,42]]], arms:[[[20,40],[12,44]]] }) + plate(10, 44, 5) + `<path class="eq" d="M10 30 Q4 38 8 46"/>`,
+  bicyclecrunch: ground() + fig({ h:[12,40], s:[18,45], p:[33,53], legs:[[[34,40],[26,38]],[[46,51],[58,49]]], arms:[[[26,40],[16,35]]] }),
+  sideplank: ground() + fig({ h:[13,27], s:[18,33], p:[37,44], legs:[[[56,55]]], arms:[[[18,56],[28,56]],[[18,16]]] }),
+  abroller: ground() + `<circle class="eq" cx="50" cy="53" r="4.5"/>` + fig({ h:[44,36], s:[38,41], p:[22,46], legs:[[[14,56],[5,56]]], arms:[[[50,49]]] }),
+  stretching: ground() + fig({ h:[30,10], s:[30,18], p:[30,36], legs:[[[30,47],[30,58]],[[27,46],[19,38]]], arms:[[[25,28],[20,37]],[[38,20],[45,15]]] }),
+  running: ground() + EQ([2,22],[10,22]) + EQ([0,30],[8,30]) + EQ([2,38],[9,38]) +
+    fig({ h:[35,10], s:[34,18], p:[32,34], legs:[[[42,40],[39,50]],[[25,43],[17,47]]], arms:[[[41,24],[46,19]],[[27,25],[22,30]]] }),
+  jumprope: EQ([6,58],[24,58]) + EQ([40,58],[58,58]) + `<path class="eq" d="M16 39 Q32 -8 48 39"/>` + `<path class="eq" d="M16 39 Q32 64 48 39" stroke-dasharray="3 3"/>` +
+    fig({ h:[32,14], s:[32,22], p:[32,39], legs:[[[29,48],[28,53]],[[35,48],[36,53]]], arms:[[[23,32],[16,39]],[[41,32],[48,39]]] }),
+});
 const icon = (key, cls = '') => `<svg class="ex ${cls}" viewBox="0 0 64 64" aria-hidden="true">${ICONS[key] || ICONS.generic}</svg>`;
 
 const BUILTIN = [
@@ -494,6 +596,121 @@ BUILTIN.push(
   { id: 'jumprope', name: 'Seilspringen', icon: 'treadmill', cat: 'Aufwärmen', kind: 'cardio' },
   { id: 'stretching', name: 'Dehnen / Mobility', icon: 'plank', cat: 'Aufwärmen', kind: 'cardio' },
 );
+BUILTIN.forEach(x => { if (ICONS[x.id]) x.icon = x.id; });
+const DESC = {
+"treadmill": "Locker starten, Tempo langsam steigern. Aufrecht gehen oder laufen, nicht an den Griffen festhalten.",
+"rower": "Erst Beine strecken, dann Oberkörper leicht zurück, zuletzt Arme ziehen. Zurück in umgekehrter Reihenfolge.",
+"stepper": "Aufrecht stehen, ganze Fußsohle aufsetzen. Gleichmäßiges Tempo, Geländer nur leicht halten.",
+"bike": "Sattel so hoch, dass das Knie unten fast gestreckt ist. Locker treten, Widerstand langsam erhöhen.",
+"bench": "Schulterblätter zusammen, Füße fest am Boden. Stange zur unteren Brust senken, kontrolliert nach oben drücken.",
+"benchbb": "Griff etwas breiter als schulterbreit. Stange zur Brustmitte senken, Ellbogen ca. 45° vom Körper, explosiv hochdrücken.",
+"incline": "Bank 30–45° schräg. Gewicht zur oberen Brust senken und senkrecht nach oben drücken.",
+"fly": "Rücken ans Polster, Ellbogen leicht gebeugt. Arme im Bogen vor der Brust zusammenführen, langsam öffnen.",
+"cablefly": "Leicht vorgebeugt in Schrittstellung. Griffe im Bogen vor der Brust zusammenführen, Ellbogen leicht gebeugt.",
+"dips": "Oberkörper leicht nach vorne. Absenken bis Oberarme etwa waagerecht, dann kräftig hochdrücken.",
+"latpull": "Breiter Griff, Brust raus. Stange zur oberen Brust ziehen, Ellbogen nach unten, langsam zurück.",
+"latnarrow": "Enger Griff, Oberkörper leicht zurück. Griff zur Brust ziehen, Schulterblätter zusammen.",
+"cablerow": "Aufrecht sitzen, Knie leicht gebeugt. Griff zum Bauch ziehen, Schulterblätter zusammen, Rücken gerade.",
+"facepull": "Seil auf Kopfhöhe. Zum Gesicht ziehen, Hände nach außen, Ellbogen hoch.",
+"deadlift": "Stange nah am Schienbein, Rücken gerade. Aus den Beinen hochdrücken, Hüfte vorschieben, Stange am Körper führen.",
+"backext": "Hüfte am Polster, Arme vor der Brust. Oberkörper senken und bis in eine gerade Linie hochkommen, nicht überstrecken.",
+"pullup": "Obergriff etwas breiter als schulterbreit. Hochziehen bis das Kinn über der Stange ist, kontrolliert ablassen.",
+"squat": "Füße schulterbreit, Stange auf dem oberen Rücken. Hüfte nach hinten, mindestens bis Oberschenkel waagerecht, Knie nach außen.",
+"legpress": "Füße schulterbreit auf der Platte. Knie bis ca. 90° beugen, hochdrücken ohne die Knie ganz durchzustrecken.",
+"legext": "Polster vor den Schienbeinen. Beine strecken, oben kurz halten, langsam absenken.",
+"legcurl": "Polster über den Fersen. Fersen zum Po ziehen, Hüfte bleibt am Polster, langsam zurück.",
+"lunge": "Großer Schritt nach vorne, hinteres Knie Richtung Boden. Über die vordere Ferse zurückdrücken.",
+"calf": "Fußballen auf der Kante. Fersen tief senken, dann so hoch wie möglich drücken.",
+"seatedcalf": "Polster auf den Knien, Fußballen auf dem Block. Fersen tief senken und kraftvoll hochdrücken.",
+"ohp": "Stange vor den Schultern, Bauch fest. Senkrecht über den Kopf drücken, nicht ins Hohlkreuz gehen.",
+"ohpdb": "Kurzhanteln auf Schulterhöhe. Nach oben drücken bis die Arme fast gestreckt sind, langsam zurück.",
+"lateral": "Leicht gebeugte Arme. Seitlich bis Schulterhöhe heben, kleiner Finger leicht oben, langsam senken.",
+"frontraise": "Arme fast gestreckt. Vor dem Körper bis Schulterhöhe heben, ohne Schwung.",
+"reversefly": "Brust ans Polster, Arme gestreckt. Griffe nach hinten außen führen, Schulterblätter zusammen.",
+"curl": "Ellbogen am Körper. Hanteln zur Schulter beugen, ohne Schwung, langsam ablassen.",
+"ezcurl": "SZ-Stange schulterbreit greifen. Ellbogen fest am Körper, hochbeugen und langsam senken.",
+"triceps": "Ellbogen fest an der Seite. Griff nach unten drücken bis die Arme gestreckt sind, langsam zurück.",
+"tricepsone": "Ein Arm, Ellbogen fixiert am Körper. Griff nach unten strecken, langsam zurück. Seiten wechseln.",
+"crunch": "Füße aufgestellt, Hände an den Schläfen. Schultern einrollend vom Boden heben, Bauch anspannen.",
+"legraise": "Rückenlage, Hände neben dem Po. Gestreckte Beine bis senkrecht heben, langsam senken ohne abzulegen.",
+"abmachine": "Polster an Brust/Schultern. Oberkörper einrollen und Bauch kräftig anspannen, langsam zurück.",
+"plank": "Unterarme unter den Schultern, Körper eine gerade Linie. Bauch und Po anspannen, halten.",
+"benchdb": "Kurzhanteln über der Brust. Absenken bis neben die Brust, dann im leichten Bogen hochdrücken.",
+"inclinebb": "Bank 30–45°. Stange zur oberen Brust senken und senkrecht hochdrücken.",
+"inclinedb": "Bank 30–45°. Kurzhanteln neben die obere Brust senken, nach oben zusammendrücken.",
+"declinebench": "Kopf tiefer als die Hüfte, Beine fixiert. Stange zur unteren Brust senken und hochdrücken.",
+"smithbench": "Stange in der Führung. Zur Brustmitte senken, kontrolliert hochdrücken, Sicherungen einstellen.",
+"chestpress": "Griffe auf Brusthöhe. Nach vorne drücken bis die Arme fast gestreckt sind, langsam zurück.",
+"inclinechestpress": "Griffe auf Höhe der oberen Brust. Schräg nach oben drücken, langsam zurück.",
+"dbfly": "Rückenlage auf der Bank, Ellbogen leicht gebeugt. Arme seitlich öffnen und im Bogen zusammenführen.",
+"inclinedbfly": "Bank 30°. Arme im Bogen öffnen bis Dehnung in der Brust, oben zusammenführen.",
+"cablelowfly": "Seilzüge unten. Griffe im Bogen von unten nach oben vor die Brust führen.",
+"pushup": "Hände etwas breiter als schulterbreit, Körper gerade. Brust zum Boden senken und hochdrücken.",
+"pullover": "Schultern quer auf der Bank, Hantel über der Brust. Mit leicht gebeugten Armen hinter den Kopf senken und zurück.",
+"dbrow": "Knie und Hand auf der Bank, Rücken gerade. Hantel zur Hüfte ziehen, Ellbogen nah am Körper.",
+"tbarrow": "Vorgebeugt, Rücken gerade. Stange zur Brust ziehen, Schulterblätter zusammen.",
+"machinerow": "Brust ans Polster. Griffe nach hinten ziehen, Schulterblätter zusammen, langsam zurück.",
+"chinup": "Untergriff schulterbreit. Hochziehen bis das Kinn über der Stange ist, langsam ablassen.",
+"assistpullup": "Knie aufs Polster, Gegengewicht wählen. Hochziehen wie bei Klimmzügen, kontrolliert zurück.",
+"latunder": "Untergriff schulterbreit. Stange zur Brust ziehen, Ellbogen nah am Körper.",
+"latone": "Ein Griff, Arm gestreckt. Ellbogen nach unten zur Hüfte ziehen, Seiten wechseln.",
+"straightarm": "Arme fast gestreckt, leicht vorgebeugt. Stange im Bogen bis zu den Oberschenkeln drücken.",
+"shrug": "Hanteln neben dem Körper. Schultern gerade nach oben ziehen, kurz halten, senken. Nicht kreisen.",
+"rackpull": "Stange auf Kniehöhe im Rack. Rücken gerade, mit Hüftstreckung hochziehen.",
+"goodmorning": "Stange auf dem oberen Rücken, Knie leicht gebeugt. Mit geradem Rücken aus der Hüfte vorbeugen und aufrichten.",
+"arnold": "Hanteln vor den Schultern, Handflächen zu dir. Beim Hochdrücken nach außen drehen.",
+"shoulderpress": "Griffe auf Schulterhöhe. Nach oben drücken, nicht ganz durchstrecken, langsam zurück.",
+"smithohp": "Stange in der Führung vor dem Kopf. Nach oben drücken, langsam bis Kinnhöhe senken.",
+"cablelateral": "Seilzug unten, Griff mit der äußeren Hand. Arm seitlich bis Schulterhöhe heben.",
+"machinelateral": "Polster außen an den Oberarmen. Arme seitlich bis Schulterhöhe heben, langsam senken.",
+"reardelt": "Oberkörper fast waagerecht vorgebeugt. Hanteln seitlich nach oben führen, Schulterblätter zusammen.",
+"uprightrow": "Stange eng vor dem Körper. Bis Brusthöhe ziehen, Ellbogen führen nach oben.",
+"cablefront": "Seilzug unten hinter dir. Gestreckten Arm vor dem Körper bis Schulterhöhe heben.",
+"hammercurl": "Hanteln mit Daumen nach oben. Ellbogen am Körper, zur Schulter beugen.",
+"bbcurl": "Langhantel schulterbreit im Untergriff. Ohne Schwung hochbeugen, langsam senken.",
+"cablecurl": "Seilzug unten. Ellbogen am Körper, Griff zur Schulter beugen, langsam zurück.",
+"preacher": "Oberarme flach aufs Polster. Gewicht hochbeugen, langsam fast ganz strecken.",
+"conccurl": "Sitzend, Ellbogen innen am Oberschenkel. Hantel zur Schulter beugen, langsam senken.",
+"inclinecurl": "Rückenlage auf Schrägbank, Arme hängen. Hanteln beugen, Ellbogen bleiben hinten.",
+"machinecurl": "Oberarme aufs Polster. Griffe zur Schulter beugen, langsam zurück.",
+"ropepush": "Seil am oberen Zug. Nach unten drücken und unten die Seilenden auseinanderziehen.",
+"skull": "Rückenlage, SZ-Stange über der Brust. Nur die Unterarme zur Stirn beugen, Ellbogen zeigen nach oben.",
+"overheadtri": "Hantel mit beiden Händen über dem Kopf. Hinter den Kopf senken, Ellbogen nach vorne, strecken.",
+"kickback": "Vorgebeugt, Oberarm parallel zum Körper. Unterarm nach hinten strecken, kurz halten.",
+"closebench": "Griff schulterbreit, Ellbogen nah am Körper. Stange zur unteren Brust senken, hochdrücken.",
+"benchdip": "Hände hinter dir auf der Bank, Beine vorne. Po absenken bis 90° im Ellbogen, hochdrücken.",
+"tricepsmachine": "Ellbogen aufs Polster. Griffe nach unten strecken, langsam zurück.",
+"wristcurl": "Unterarme auf den Oberschenkeln, Handgelenke über dem Knie. Hantel nur aus dem Handgelenk heben.",
+"frontsquat": "Stange vorne auf den Schultern, Ellbogen hoch. Aufrecht tief beugen und hochdrücken.",
+"smithsquat": "Stange in der Führung, Füße leicht vor dem Körper. Tief beugen und hochdrücken.",
+"gobletsquat": "Hantel senkrecht vor der Brust. Tief zwischen die Knie setzen, Oberkörper aufrecht.",
+"hacksquat": "Rücken ans Polster, Schultern unter die Pads. Tief beugen, über die ganze Fußsohle hochdrücken.",
+"bulgarian": "Hinterer Fuß auf der Bank. Vorderes Bein beugen bis das hintere Knie fast den Boden berührt.",
+"walklunge": "Abwechselnd große Schritte nach vorne. Hinteres Knie Richtung Boden, Oberkörper aufrecht.",
+"stepup": "Ganzer Fuß auf die Box. Über das vordere Bein hochdrücken, kontrolliert absteigen.",
+"rdl": "Knie leicht gebeugt, Rücken gerade. Stange an den Beinen entlang bis unters Knie senken, Hüfte vorschieben.",
+"sumodl": "Breiter Stand, Fußspitzen außen. Stange zwischen den Beinen greifen, gerade hochdrücken.",
+"seatedlegcurl": "Polster auf den Oberschenkeln und hinter den Waden. Unterschenkel nach unten-hinten beugen.",
+"hipthrust": "Schultern auf der Bank, Stange auf der Hüfte. Hüfte hoch bis Körper gerade, Po anspannen.",
+"glutebridge": "Rückenlage, Füße aufgestellt. Hüfte hochdrücken bis zur geraden Linie, Po anspannen.",
+"abductor": "Polster außen an den Knien. Beine nach außen drücken, langsam zurück.",
+"adductor": "Polster innen an den Knien. Beine zusammendrücken, langsam öffnen.",
+"glutekick": "Seil am Fußgelenk. Gestrecktes Bein nach hinten führen, Po anspannen, Rücken gerade.",
+"presscalf": "Fußballen am unteren Rand der Platte, Beine gestreckt. Platte nur mit den Füßen wegdrücken.",
+"hanglegraise": "An der Stange hängen. Beine gestreckt oder angewinkelt bis Hüfthöhe heben, ohne Schwung.",
+"cablecrunch": "Kniend, Seil am Kopf. Oberkörper einrollen Richtung Knie, Hüfte bleibt still.",
+"situp": "Füße fixiert. Oberkörper ganz aufrichten und langsam abrollen.",
+"russiantwist": "Sitzend, Oberkörper leicht zurück, Füße hoch. Gewicht von Seite zu Seite drehen.",
+"bicyclecrunch": "Rückenlage, Hände am Kopf. Ellbogen abwechselnd zum gegenüberliegenden Knie.",
+"sideplank": "Seitlich auf dem Unterarm, Körper gerade. Hüfte hoch halten, Seiten wechseln.",
+"abroller": "Kniend, Rad vor dir. Langsam nach vorne rollen, Rücken gerade, mit dem Bauch zurückziehen.",
+"mountain": "Liegestützposition. Knie abwechselnd zügig zur Brust ziehen, Hüfte tief.",
+"crosstrainer": "Aufrecht, ganze Fußsohle auf den Pedalen. Arme und Beine gleichmäßig mitbewegen.",
+"running": "Locker starten, kurze Schritte. Tempo nach 5 Minuten steigern.",
+"jumprope": "Aus den Handgelenken drehen. Kleine Sprünge auf den Fußballen.",
+"stretching": "Jede Dehnung 20–30 Sekunden halten. Ruhig atmen, nicht wippen."
+};
+
 const CATS = ['Aufwärmen', 'Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene'];
 
 /* ================= State & storage ================= */
@@ -794,7 +1011,7 @@ function viewExercise() {
   if (x.kind === 'cardio') return viewCardio(x, k, sets, prev);
   let h = `<div class="ex-hero"><div class="ic">${icon(x.icon)}</div><div class="grow"><h2>${esc(x.name)}</h2>
     <div class="small muted">${esc(relDay(k))}, ${fmtKey(k, { day: '2-digit', month: '2-digit', year: 'numeric' })}</div></div>
-    <button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>
+    <button class="info-btn" data-act="ex-info" aria-label="Ausführung anzeigen">i</button><button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>
     ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
   if (prev) {
     h += `<div class="target"><div class="small t2">Letztes Mal (${esc(fmtKey(prev.date, { day: '2-digit', month: '2-digit' }))}): ${esc(setsText(prev.sets))}</div>
@@ -820,7 +1037,7 @@ function viewCardio(x, k, sets, prev) {
   const s0 = sets[0] || {}; const pm = prev ? prev.sets.reduce((a, s) => a + (s.m || 0), 0) : null;
   let h = `<div class="ex-hero"><div class="ic">${icon(x.icon)}</div><div class="grow"><h2>${esc(x.name)}</h2>
     <div class="small muted">Aufwärmen · ${esc(relDay(k))}, ${fmtKey(k, { day: '2-digit', month: '2-digit', year: 'numeric' })}</div></div>
-    <button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>
+    <button class="info-btn" data-act="ex-info" aria-label="Ausführung anzeigen">i</button><button class="icon-btn" data-act="ex-menu" aria-label="Optionen">${SV.dots}</button></div>
     ${timerHTML(k) ? `<div class="timerbar">${timerHTML(k)}</div>` : ''}`;
   h += prev ? `<div class="target"><div class="small t2">Letztes Mal (${esc(fmtKey(prev.date, { day: '2-digit', month: '2-digit' }))}): <b>${fmtNum(pm)} min</b></div></div>`
             : '';
@@ -1142,6 +1359,20 @@ function exerciseDialog(existing) {
     } }).then(ok => { const name = (window.__mname || '').trim(); res(ok && name ? { name, icon: pick } : null); });
   });
 }
+function showInfo(x) {
+  if (!x) return;
+  const txt = DESC[x.id] || 'Für diese eigene Übung gibt es noch keine Beschreibung.';
+  const bg = document.createElement('div'); bg.className = 'info-bg';
+  bg.innerHTML = `<div class="info-card" role="dialog" aria-label="Ausführung ${esc(x.name)}"><button class="info-x" aria-label="Schließen">${SV.x}</button>
+    <div class="row" style="gap:10px;margin-bottom:8px;padding-right:30px"><div class="info-ic">${icon(x.icon)}</div><div class="title" style="line-height:1.2">${esc(x.name)}</div></div>
+    <div class="small muted" style="text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:4px">So geht's</div>
+    <div class="info-txt">${esc(txt)}</div></div>`;
+  const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  bg.addEventListener('click', e => { if (e.target === bg || e.target.closest('.info-x')) close(); });
+  document.addEventListener('keydown', onKey);
+  document.body.appendChild(bg);
+}
 let toastT;
 function toast(msg) { let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); } t.textContent = msg; clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2400); }
 
@@ -1179,6 +1410,7 @@ document.addEventListener('click', async ev => {
     }
     case 'ics-all': exportICS(Object.keys(S.plan).filter(k => k >= todayKey() && !mainGroup(k)).sort()); break;
     case 'plan-start': startPlanned(S.day); break;
+    case 'ex-info': showInfo(exById(S.ex)); break;
     case 'cal-open': { const d = keyDate(S.day); S.cal = { y: d.getFullYear(), m: d.getMonth() }; render(); window.scrollTo(0, 0); break; }
     case 'cal-close': S.cal = null; render(); break;
     case 'cal-month': { let { y, m } = S.cal; m += +el.dataset.d; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } S.cal = { y, m }; render(); break; }
