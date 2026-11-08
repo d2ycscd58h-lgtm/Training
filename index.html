@@ -292,17 +292,22 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const num = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) ? n : null; };
-const fmtNum = n => n == null ? '–' : (Math.round(n * 10) / 10).toLocaleString('de-DE');
+const fmtNum = n => n == null ? '–' : (Math.round(n * 10) / 10).toLocaleString(LOC);
 const norm = s => String(s || '').trim().toLowerCase();
 const e1rm = (w, r) => (r == null || r <= 0) ? null : (w == null || w <= 0 ? null : (r === 1 ? w : w * (1 + r / 30)));
 const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } };
 const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} };
+// ---- Sprache: automatisch nach iPhone-Einstellung, umstellbar in den Einstellungen ----
+const LANG = (() => { const p = lsGet('tt_prefs') || {}; if (p.lang === 'de' || p.lang === 'en') return p.lang; return (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en'; })();
+const LOC = LANG === 'de' ? 'de-DE' : ((navigator.language || '').toLowerCase().startsWith('en') ? navigator.language : 'en-GB');
+const DEC = LANG === 'de' ? ',' : '.';
+document.documentElement.lang = LANG;
 const pad = n => String(n).padStart(2, '0');
 const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const keyDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
 const todayKey = () => dayKey(new Date());
 const shiftKey = (k, n) => { const d = keyDate(k); d.setDate(d.getDate() + n); return dayKey(d); };
-const fmtKey = (k, o) => keyDate(k).toLocaleDateString('de-DE', o || { weekday: 'short', day: '2-digit', month: '2-digit', year: '2-digit' });
+const fmtKey = (k, o) => keyDate(k).toLocaleDateString(LOC, o || { weekday: 'short', day: '2-digit', month: '2-digit', year: '2-digit' });
 const relDay = k => { const t = todayKey(); if (k === t) return 'Heute'; if (k === shiftKey(t, -1)) return 'Gestern'; return fmtKey(k, { weekday: 'long' }); };
 const startOfWeekKey = () => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return dayKey(d); };
 const SV = {
@@ -740,6 +745,132 @@ const DESC = {
 "stretching": "Jede Dehnung 20–30 Sekunden halten. Ruhig atmen, nicht wippen."
 };
 
+const NAME_EN = {"treadmill": "Treadmill", "rower": "Rowing machine", "stepper": "Stair stepper", "bike": "Stationary bike", "bench": "Bench press", "benchbb": "Barbell bench press", "incline": "Incline press", "fly": "Pec deck", "cablefly": "Cable fly", "dips": "Dips", "latpull": "Lat pulldown", "latnarrow": "Close-grip lat pulldown", "cablerow": "Seated cable row", "facepull": "Face pulls", "deadlift": "Deadlift", "backext": "Back extension", "pullup": "Pull-ups", "squat": "Squat", "legpress": "Leg press", "legext": "Leg extension", "legcurl": "Lying leg curl", "lunge": "Lunges", "calf": "Standing calf raise", "seatedcalf": "Seated calf raise", "ohp": "Overhead press", "ohpdb": "Dumbbell shoulder press", "lateral": "Lateral raise", "frontraise": "Front raise", "reversefly": "Reverse pec deck", "curl": "Dumbbell curl", "ezcurl": "EZ-bar curl", "triceps": "Triceps pushdown", "tricepsone": "Single-arm pushdown", "crunch": "Crunches", "legraise": "Lying leg raise", "abmachine": "Ab crunch machine", "plank": "Plank (seconds)", "benchdb": "Dumbbell bench press", "inclinebb": "Incline barbell press", "inclinedb": "Incline dumbbell press", "declinebench": "Decline bench press", "smithbench": "Smith machine bench press", "chestpress": "Chest press machine", "inclinechestpress": "Incline chest press machine", "dbfly": "Dumbbell fly", "inclinedbfly": "Incline dumbbell fly", "cablelowfly": "Low-to-high cable fly", "pushup": "Push-ups", "pullover": "Dumbbell pullover", "dbrow": "Single-arm dumbbell row", "tbarrow": "T-bar row", "machinerow": "Seated machine row", "chinup": "Chin-ups", "assistpullup": "Assisted pull-ups", "latunder": "Underhand lat pulldown", "latone": "Single-arm lat pulldown", "straightarm": "Straight-arm pulldown", "shrug": "Shrugs", "rackpull": "Rack pulls", "goodmorning": "Good mornings", "arnold": "Arnold press", "shoulderpress": "Shoulder press machine", "smithohp": "Smith machine overhead press", "cablelateral": "Cable lateral raise", "machinelateral": "Lateral raise machine", "reardelt": "Bent-over rear delt raise", "uprightrow": "Upright row", "cablefront": "Cable front raise", "hammercurl": "Hammer curls", "bbcurl": "Barbell curl", "cablecurl": "Cable curl", "preacher": "Preacher curl", "conccurl": "Concentration curl", "inclinecurl": "Incline dumbbell curl", "machinecurl": "Biceps curl machine", "ropepush": "Rope pushdown", "skull": "Skull crushers (EZ bar)", "overheadtri": "Overhead triceps extension", "kickback": "Triceps kickbacks", "closebench": "Close-grip bench press", "benchdip": "Bench dips", "tricepsmachine": "Triceps machine", "wristcurl": "Wrist curls", "frontsquat": "Front squat", "smithsquat": "Smith machine squat", "gobletsquat": "Goblet squat", "hacksquat": "Hack squat", "bulgarian": "Bulgarian split squat", "walklunge": "Walking lunges", "stepup": "Step-ups", "rdl": "Romanian deadlift", "sumodl": "Sumo deadlift", "seatedlegcurl": "Seated leg curl", "hipthrust": "Hip thrust", "glutebridge": "Glute bridge", "abductor": "Hip abduction machine", "adductor": "Hip adduction machine", "glutekick": "Cable glute kickback", "presscalf": "Leg press calf raise", "hanglegraise": "Hanging leg raise", "cablecrunch": "Cable crunch", "situp": "Sit-ups", "russiantwist": "Russian twist", "bicyclecrunch": "Bicycle crunches", "sideplank": "Side plank (seconds)", "abroller": "Ab wheel rollout", "mountain": "Mountain climbers", "crosstrainer": "Elliptical", "running": "Running (outdoor)", "jumprope": "Jump rope", "stretching": "Stretching / mobility"};
+const DESC_EN = {"treadmill": "Start easy and increase the pace gradually. Walk or run upright, don't hold the handles.", "rower": "Push with the legs first, then lean back slightly, then pull with the arms. Return in reverse order.", "stepper": "Stand tall, keep the whole foot on the step. Steady pace, hold the rails only lightly.", "bike": "Seat high enough that the knee is almost straight at the bottom. Pedal easily, add resistance slowly.", "bench": "Squeeze shoulder blades together, feet planted. Lower to the lower chest, press up under control.", "benchbb": "Grip slightly wider than shoulders. Lower the bar to mid-chest, elbows ~45° from the body, press up explosively.", "incline": "Bench at 30–45°. Lower to the upper chest and press straight up.", "fly": "Back against the pad, elbows slightly bent. Bring arms together in an arc in front of the chest, open slowly.", "cablefly": "Staggered stance, lean forward slightly. Bring the handles together in an arc in front of the chest, elbows slightly bent.", "dips": "Lean the torso slightly forward. Lower until upper arms are about parallel, then press up hard.", "latpull": "Wide grip, chest up. Pull the bar to the upper chest, elbows down, return slowly.", "latnarrow": "Close grip, lean back slightly. Pull the handle to the chest, squeeze the shoulder blades.", "cablerow": "Sit tall, knees slightly bent. Pull the handle to the belly, squeeze shoulder blades, keep the back straight.", "facepull": "Rope at head height. Pull towards the face, hands apart, elbows high.", "deadlift": "Bar close to the shins, back straight. Drive up with the legs, push the hips forward, keep the bar close.", "backext": "Hips on the pad, arms across the chest. Lower the torso and rise to a straight line, don't overextend.", "pullup": "Overhand grip slightly wider than shoulders. Pull until the chin is over the bar, lower under control.", "squat": "Feet shoulder-width, bar on the upper back. Hips back, at least thighs parallel, knees out.", "legpress": "Feet shoulder-width on the platform. Bend knees to about 90°, press up without locking the knees.", "legext": "Pad in front of the shins. Straighten the legs, hold briefly, lower slowly.", "legcurl": "Pad above the heels. Curl heels to the glutes, hips stay on the pad, return slowly.", "lunge": "Big step forward, back knee towards the floor. Push back through the front heel.", "calf": "Balls of the feet on the edge. Lower the heels deep, then rise as high as possible.", "seatedcalf": "Pad on the knees, balls of the feet on the block. Lower heels deep and press up hard.", "ohp": "Bar in front of the shoulders, core tight. Press straight overhead, don't arch the lower back.", "ohpdb": "Dumbbells at shoulder height. Press up until arms are almost straight, lower slowly.", "lateral": "Slightly bent arms. Raise to the side up to shoulder height, lower slowly.", "frontraise": "Arms almost straight. Raise in front of the body to shoulder height, no swinging.", "reversefly": "Chest against the pad, arms straight. Move the handles back and out, squeeze shoulder blades.", "curl": "Elbows at your sides. Curl the dumbbells to the shoulders without swinging, lower slowly.", "ezcurl": "Grip the EZ bar shoulder-width. Elbows fixed at the sides, curl up and lower slowly.", "triceps": "Elbows fixed at your sides. Push the handle down until arms are straight, return slowly.", "tricepsone": "One arm, elbow fixed at your side. Extend the handle down, return slowly. Switch sides.", "crunch": "Feet planted, hands at the temples. Curl the shoulders off the floor, tense the abs.", "legraise": "Lie on your back, hands by your hips. Raise straight legs to vertical, lower slowly without touching down.", "abmachine": "Pad at chest/shoulders. Curl the torso and squeeze the abs, return slowly.", "plank": "Forearms under the shoulders, body in a straight line. Tense abs and glutes, hold.", "benchdb": "Dumbbells over the chest. Lower beside the chest, then press up in a slight arc.", "inclinebb": "Bench at 30–45°. Lower the bar to the upper chest and press straight up.", "inclinedb": "Bench at 30–45°. Lower dumbbells beside the upper chest, press up and together.", "declinebench": "Head lower than hips, legs secured. Lower the bar to the lower chest and press up.", "smithbench": "Bar in the guide rails. Lower to mid-chest, press up under control, set the safeties.", "chestpress": "Handles at chest height. Press forward until arms are almost straight, return slowly.", "inclinechestpress": "Handles at upper chest height. Press up at an angle, return slowly.", "dbfly": "Lie on the bench, elbows slightly bent. Open the arms wide and bring them together in an arc.", "inclinedbfly": "Bench at 30°. Open the arms in an arc until you feel a chest stretch, bring together at the top.", "cablelowfly": "Cables at the bottom. Bring the handles in an arc from low to chest height.", "pushup": "Hands slightly wider than shoulders, body straight. Lower the chest to the floor and push up.", "pullover": "Shoulders across the bench, dumbbell over the chest. Lower behind the head with slightly bent arms and return.", "dbrow": "Knee and hand on the bench, back straight. Pull the dumbbell to the hip, elbow close to the body.", "tbarrow": "Bent over, back straight. Pull the bar to the chest, squeeze the shoulder blades.", "machinerow": "Chest against the pad. Pull the handles back, squeeze shoulder blades, return slowly.", "chinup": "Underhand grip shoulder-width. Pull until the chin is over the bar, lower slowly.", "assistpullup": "Knees on the pad, choose the counterweight. Pull up like a pull-up, return under control.", "latunder": "Underhand grip shoulder-width. Pull the bar to the chest, elbows close to the body.", "latone": "One handle, arm straight. Drive the elbow down to the hip, switch sides.", "straightarm": "Arms almost straight, lean forward slightly. Press the bar in an arc down to the thighs.", "shrug": "Dumbbells at your sides. Lift the shoulders straight up, hold briefly, lower. Don't roll them.", "rackpull": "Bar at knee height in the rack. Back straight, pull up by extending the hips.", "goodmorning": "Bar on the upper back, knees slightly bent. Hinge forward at the hips with a straight back and stand up.", "arnold": "Dumbbells in front of the shoulders, palms facing you. Rotate outwards while pressing up.", "shoulderpress": "Handles at shoulder height. Press up without fully locking out, return slowly.", "smithohp": "Bar in the guide rails in front of the head. Press up, lower slowly to chin height.", "cablelateral": "Cable at the bottom, handle in the outside hand. Raise the arm to the side to shoulder height.", "machinelateral": "Pads on the outside of the upper arms. Raise arms to the side to shoulder height, lower slowly.", "reardelt": "Torso bent almost horizontal. Raise the dumbbells out to the side, squeeze the shoulder blades.", "uprightrow": "Bar close in front of the body. Pull to chest height, elbows lead upwards.", "cablefront": "Cable low behind you. Raise the straight arm in front to shoulder height.", "hammercurl": "Dumbbells with thumbs up. Elbows at your sides, curl to the shoulders.", "bbcurl": "Barbell shoulder-width, underhand grip. Curl up without swinging, lower slowly.", "cablecurl": "Cable at the bottom. Elbows at your sides, curl the handle to the shoulders, return slowly.", "preacher": "Upper arms flat on the pad. Curl the weight up, lower slowly until almost straight.", "conccurl": "Seated, elbow against the inner thigh. Curl the dumbbell to the shoulder, lower slowly.", "inclinecurl": "Lie back on an incline bench, arms hanging. Curl the dumbbells, elbows stay back.", "machinecurl": "Upper arms on the pad. Curl the handles to the shoulders, return slowly.", "ropepush": "Rope on the high pulley. Push down and pull the rope ends apart at the bottom.", "skull": "Lie on your back, EZ bar over the chest. Bend only the forearms towards the forehead, elbows point up.", "overheadtri": "Dumbbell in both hands overhead. Lower behind the head, elbows forward, extend.", "kickback": "Bent over, upper arm parallel to the body. Extend the forearm back, hold briefly.", "closebench": "Grip shoulder-width, elbows close to the body. Lower the bar to the lower chest, press up.", "benchdip": "Hands on the bench behind you, legs in front. Lower until elbows reach 90°, press up.", "tricepsmachine": "Elbows on the pad. Extend the handles down, return slowly.", "wristcurl": "Forearms on the thighs, wrists over the knees. Lift the dumbbell only with the wrists.", "frontsquat": "Bar on the front of the shoulders, elbows high. Squat deep and upright, then stand up.", "smithsquat": "Bar in the guide rails, feet slightly in front. Squat deep and press up.", "gobletsquat": "Dumbbell held vertically at the chest. Sit deep between the knees, torso upright.", "hacksquat": "Back against the pad, shoulders under the pads. Squat deep, press up through the whole foot.", "bulgarian": "Rear foot on the bench. Bend the front leg until the back knee almost touches the floor.", "walklunge": "Alternate big steps forward. Back knee towards the floor, torso upright.", "stepup": "Whole foot on the box. Drive up through the front leg, step down under control.", "rdl": "Knees slightly bent, back straight. Lower the bar along the legs to below the knee, drive the hips forward.", "sumodl": "Wide stance, toes out. Grip the bar between the legs, stand up straight.", "seatedlegcurl": "Pads on the thighs and behind the calves. Curl the lower legs down and back.", "hipthrust": "Shoulders on the bench, bar on the hips. Lift the hips until the body is straight, squeeze the glutes.", "glutebridge": "Lie on your back, feet planted. Push the hips up into a straight line, squeeze the glutes.", "abductor": "Pads on the outside of the knees. Push the legs apart, return slowly.", "adductor": "Pads on the inside of the knees. Squeeze the legs together, open slowly.", "glutekick": "Cuff on the ankle. Move the straight leg back, squeeze the glutes, back straight.", "presscalf": "Balls of the feet on the lower edge of the platform, legs straight. Push the platform away with the feet only.", "hanglegraise": "Hang from the bar. Raise straight or bent legs to hip height without swinging.", "cablecrunch": "Kneeling, rope at the head. Curl the torso towards the knees, hips stay still.", "situp": "Feet anchored. Sit all the way up and roll down slowly.", "russiantwist": "Seated, torso leaning back slightly, feet up. Rotate the weight from side to side.", "bicyclecrunch": "Lie on your back, hands at the head. Alternate elbow to the opposite knee.", "sideplank": "On one forearm, body straight. Keep the hips up, switch sides.", "abroller": "Kneeling, wheel in front of you. Roll forward slowly with a straight back, pull back with the abs.", "mountain": "Push-up position. Drive the knees alternately and quickly to the chest, hips low.", "crosstrainer": "Stand tall, whole foot on the pedals. Move arms and legs evenly.", "running": "Start easy with short steps. Increase the pace after 5 minutes.", "jumprope": "Turn the rope from the wrists. Small jumps on the balls of the feet.", "stretching": "Hold each stretch for 20–30 seconds. Breathe calmly, don't bounce."};
+// ---- Englische Übersetzung der Oberfläche (exakte Texte) ----
+const UI_EN = {
+  'Training': 'Workout', 'Verlauf': 'History', 'Fortschritt': 'Progress', 'Einstellungen': 'Settings', 'Übungen': 'Exercises',
+  'Bereit für dein nächstes Training?': 'Ready for your next workout?', 'Weiter so – du bist mitten im Training.': 'Keep going – you\'re mid-workout.',
+  'Starkes Training heute! 💪': 'Great workout today! 💪', 'Namen festlegen': 'Set your name',
+  'Nur dieses Gerät': 'This device only', 'Gespeichert': 'Saved', 'Speichert…': 'Saving…', 'Synchronisiere…': 'Syncing…', 'Lädt…': 'Loading…', 'Offline': 'Offline', 'Nicht gespeichert': 'Not saved',
+  'Heute': 'Today', 'Gestern': 'Yesterday', 'Vorheriger Tag': 'Previous day', 'Nächster Tag': 'Next day', 'Monatsübersicht öffnen': 'Open month view',
+  '⏱ Die Trainingszeit startet mit „Start“ beim Aufwärmen oder mit deinem ersten Eintrag': '⏱ The workout timer starts with “Start” on a warm-up or with your first entry',
+  'Nächstes Training': 'Next workout', 'Meine Routinen': 'My routines', 'noch nie': 'never', 'Neue Routine': 'New routine', 'Zuletzt trainiert': 'Recently trained',
+  'Alle Übungen': 'All exercises', 'Aufwärmen': 'Warm-up', 'Brust': 'Chest', 'Rücken': 'Back', 'Beine': 'Legs', 'Schultern': 'Shoulders', 'Arme': 'Arms', 'Bauch': 'Abs', 'Eigene': 'Custom',
+  'Eigene Übungen': 'Custom exercises', 'Übung hinzufügen': 'Add exercise', 'Ausführung anzeigen': 'Show how to', 'Optionen': 'Options',
+  'Ziel heute:': 'Today\'s goal:', '– Ziele für jeden Satz stehen unten': '– goals for each set are below',
+  'Tipp: Tippe auf die Satznummer, um einen Satz als': 'Tip: tap the set number to mark a set as a', 'Aufwärmsatz (A)': 'warm-up set (A)', 'zu markieren.': '',
+  'Satz': 'Set', 'Gewicht (kg)': 'Weight (kg)', 'Wdh.': 'Reps', '+ Satz hinzufügen': '+ Add set', 'Fertig': 'Done', 'Satz löschen': 'Delete set',
+  'Start drücken, wenn du loslegst': 'Press start when you begin', '▶ Start': '▶ Start', '■ Stopp': '■ Stop', 'Dauer heute (Minuten)': 'Duration today (minutes)',
+  'Wird bei „Stopp“ automatisch ausgefüllt, du kannst es aber auch selbst eintragen.': 'Filled in automatically when you press “Stop” – or enter it yourself.',
+  'Für frühere Tage die Minuten unten eintragen': 'For past days, enter the minutes below',
+  'Erstes Mal – trag einfach ein, was du schaffst. Beim nächsten Mal siehst du hier dein Ziel.': 'First time – just log what you manage. Next time you\'ll see your goal here.',
+  "So geht's": 'How to', 'Schließen': 'Close', 'Aus der Übersicht entfernen': 'Remove from list', 'Übung löschen': 'Delete exercise', 'Name / Bild ändern': 'Change name / image',
+  'Für diese eigene Übung gibt es noch keine Beschreibung.': 'There\'s no description for this custom exercise yet.',
+  '■ Training beenden': '■ Finish workout', 'Training beenden?': 'Finish workout?', 'Heutige Routine': 'Today\'s routine', 'Routine bearbeiten': 'Edit routine', 'Andere Routine': 'Other routine',
+  'Aufwärmsatz · zählt nicht für Ziele und Rekorde': 'Warm-up set · doesn\'t count for goals and records', 'Aufwärmsatz – tippen für Arbeitssatz': 'Warm-up set – tap for working set',
+  'Übersicht': 'Overview', 'Dauer:': 'Duration:', 'Abbrechen': 'Cancel', 'Beenden': 'Finish', 'Rekord': 'PR',
+  'Mo': 'Mo', 'Di': 'Tu', 'Mi': 'We', 'Do': 'Th', 'Fr': 'Fr', 'Sa': 'Sa', 'So': 'Su',
+  'Tippe auf einen vergangenen Tag, um zu sehen, was du trainiert hast.': 'Tap a past day to see what you trained.',
+  'Tippe auf einen zukünftigen Tag, um ein Training zu planen.': 'Tap a future day to plan a workout.', 'Umrandete Kürzel sind geplant.': 'Outlined tags are planned.',
+  'In diesem Monat noch kein Training eingetragen.': 'No workouts logged this month yet.',
+  '📲 Die Übernahme in den iPhone-Kalender geht in der App auf deinem Startbildschirm.': '📲 Adding to the iPhone calendar works in the app on your home screen.',
+  'Vormonat': 'Previous month', 'Nächster Monat': 'Next month', 'Ändern': 'Change', 'Plan löschen': 'Delete plan', 'Training planen': 'Plan workout', 'Geplantes Training ändern': 'Change planned workout',
+  'Was trainierst du?': 'What are you training?', 'Uhrzeit': 'Time', 'Erinnerung': 'Reminder', 'Keine': 'None', '15 min vorher': '15 min before', '30 min vorher': '30 min before', '1 Std. vorher': '1 h before', '2 Std. vorher': '2 h before',
+  'Wiederholen': 'Repeat', 'Nur dieser Tag': 'This day only', 'Jede Woche, 4 Wochen': 'Weekly, 4 weeks', 'Jede Woche, 8 Wochen': 'Weekly, 8 weeks', 'Jede Woche, 12 Wochen': 'Weekly, 12 weeks',
+  'Speichern': 'Save', 'Tag öffnen': 'Open day', '▶ Jetzt starten': '▶ Start now', '📲 In iPhone-Kalender': '📲 Add to iPhone calendar',
+  'Name der Routine': 'Routine name', '+ Übungen hinzufügen': '+ Add exercises', 'Löschen': 'Delete', 'z. B. Brust-Tag': 'e.g. Chest day', 'Nach oben': 'Move up', 'Nach unten': 'Move down', 'Entfernen': 'Remove',
+  'Routine': 'Routine', 'Noch keine Übungen.': 'No exercises yet.', 'Übernommen aus deinem heutigen Training – passe sie einfach an.': 'Taken from today\'s workout – adjust as you like.',
+  '🔍 Übung suchen': '🔍 Search exercises', '▶ Routine starten': '▶ Start routine', 'Bearbeiten': 'Edit', 'Nichts gefunden.': 'Nothing found.',
+  'Deine Trainingspläne': 'Your workout plans', '+ Routine anlegen': '+ Create routine',
+  'Lege Routinen an, z. B. „Brust-Tag“, „Rücken-Tag“ und „Bein-Tag“. Dann hast du beim Training nur deine Übungen in der richtigen Reihenfolge vor dir.': 'Create routines, e.g. “Chest day”, “Back day” and “Leg day”. Then you\'ll only see your exercises in the right order while training.',
+  'Diese Woche': 'This week', 'Letzte 30 Tage': 'Last 30 days', 'Gesamt': 'Total', 'Tag löschen': 'Delete day', 'Daten': 'Data',
+  'Hier erscheinen deine Trainingstage.': 'Your workout days will appear here.',
+  'Deine Einträge liegen gerade nur auf diesem Gerät. Lege ab und zu ein Backup an.': 'Your entries are only on this device right now. Make a backup now and then.',
+  'Deine Einträge sind nur auf diesem iPhone gespeichert. Sichere ab und zu ein Backup, z. B. in der Dateien-App oder in iCloud Drive.': 'Your entries are only stored on this iPhone. Save a backup now and then, e.g. in the Files app or iCloud Drive.',
+  'Deine Einträge werden privat in deinem Claude-Konto gespeichert – auf jedem Gerät, auf dem du angemeldet bist.': 'Your entries are stored privately in your Claude account – on every device where you\'re signed in.',
+  'Backup sichern': 'Save backup', 'Backup laden': 'Load backup', 'Backup kopieren': 'Copy backup', 'Backup einfügen': 'Paste backup', 'Noch kein Backup gesichert.': 'No backup saved yet.',
+  'Einträge aus dem Backup werden ergänzt. Bereits vorhandene Tage bleiben unverändert.': 'Entries from the backup are added. Existing days stay unchanged.',
+  'Importieren': 'Import', 'Backup hier einfügen': 'Paste backup here', 'Backup': 'Backup', 'Markiere den Text und kopiere ihn:': 'Select the text and copy it:',
+  'Max. Gewicht': 'Max weight', '1RM': '1RM', 'Max. Wdh.': 'Max reps', 'Volumen': 'Volume', 'Max Gewicht': 'Max weight', 'Max Wdh.': 'Max reps', 'Minuten': 'Minutes', 'Einträge': 'Entries', 'Datum': 'Date', 'Sätze': 'Sets', 'Dauer': 'Duration',
+  'Sobald du Sätze eingetragen hast, siehst du hier deine Steigerung pro Übung.': 'Once you\'ve logged sets, you\'ll see your progress per exercise here.',
+  'Für diese Kennzahl fehlen noch Werte.': 'No values for this metric yet.',
+  'Dein Name': 'Your name', 'Farbe': 'Color', 'Ändert Knöpfe, Bilder, Ziele und Diagramme.': 'Changes buttons, images, goals and charts.', 'Design': 'Appearance',
+  'Automatisch': 'Automatic', 'Hell': 'Light', 'Dunkel': 'Dark', '„Automatisch“ folgt der Einstellung deines iPhones.': '“Automatic” follows your iPhone setting.', 'Vorschau': 'Preview', 'Start': 'Start',
+  'Backup & Daten (im Verlauf)': 'Backup & data (in History)', 'z. B. Oliver': 'e.g. Oliver', 'Sprache': 'Language', 'Deutsch': 'Deutsch', 'English': 'English',
+  'Blau': 'Blue', 'Grün': 'Green', 'Orange': 'Orange', 'Lila': 'Purple', 'Pink': 'Pink', 'Rot': 'Red', 'Türkis': 'Teal', 'Gold': 'Gold',
+  'Neue Übung': 'New exercise', 'Übung bearbeiten': 'Edit exercise', 'Name': 'Name', 'Bild auswählen': 'Choose image', 'z. B. Hammercurls': 'e.g. Hammer curls',
+  'Routine löschen?': 'Delete routine?', 'Trainingstag löschen?': 'Delete workout day?', 'Übung löschen?': 'Delete exercise?', 'Übung ausblenden?': 'Hide exercise?', 'Ausblenden': 'Hide',
+  'Bisherige Einträge bleiben im Verlauf erhalten.': 'Previous entries stay in your history.',
+  'Backup gesichert': 'Backup saved', 'Backup kopiert – z. B. in Notizen einfügen': 'Backup copied – e.g. paste it into Notes', 'Das ist kein gültiges Backup.': 'That\'s not a valid backup.',
+  'Keine geplanten Trainings': 'No planned workouts', 'Plan gelöscht': 'Plan deleted', 'Sichern hat nicht geklappt.': 'Saving didn\'t work.', 'Speicher voll – bitte alte Tage löschen.': 'Storage full – please delete old days.',
+  'Start/Stopp geht nur für heute.': 'Start/stop only works for today.', 'Training beendet – stark! 💪': 'Workout finished – well done! 💪', 'Wähle die Übungen für deine Routine': 'Pick the exercises for your routine',
+  'Übung hinzugefügt': 'Exercise added', 'Training geplant': 'Workout planned', 'Als Aufwärmsatz markiert': 'Marked as warm-up set', 'Wieder normaler Satz': 'Back to a normal set',
+  'Ohne Namen': 'Unnamed', 'Training gespeichert 💪': 'Workout saved 💪', 'Tippen zum Starten': 'Tap to start', 'Einstellungen': 'Settings',
+  '+ Als eigene Übung anlegen': '+ Create as custom exercise', 'Übungen hinzufügen': 'Add exercises',
+  'Die App begrüßt dich damit:': 'The app greets you with:', 'Bestwert': 'Best', 'Trainingszeit': 'Workout time', 'Training': 'Workout',
+};
+// Dynamische Texte (reguläre Ausdrücke, Reihenfolge wichtig)
+const GRP_EN = { 'Brust': 'Chest', 'Rücken': 'Back', 'Bein': 'Leg', 'Beine': 'Leg', 'Schultern': 'Shoulder', 'Arme': 'Arm', 'Bauch': 'Abs', 'Aufwärmen': 'Warm-up', 'Eigene': 'Custom', 'Neue': 'New' };
+const RX_EN = [
+  [/^Hallo (.+) 👋$/, 'Hi $1 👋'], [/^Hallo 👋$/, 'Hi 👋'],
+  [/^(Brust|Rücken|Beine?|Schultern|Arme|Bauch|Aufwärmen|Eigene|Neue)-Tag$/, (m, g) => GRP_EN[g] + ' day'],
+  [/^(.*) · (Brust|Rücken|Beine?|Schultern|Arme|Bauch)-Tag$/, (m, a, g) => a + ' · ' + GRP_EN[g] + ' day'],
+  [/^(Brust|Rücken|Beine?|Schultern|Arme|Bauch|Aufwärmen|Eigene)-Tag (.*)$/, (m, g, r) => GRP_EN[g] + ' day ' + r],
+  [/^Letztes Mal \((.+?)\): (.*)$/, 'Last time ($1): $2'],
+  [/^Aufwärmen · (.*)$/, 'Warm-up · $1'],
+  [/^Heute, (.*)$/, 'Today, $1'], [/^Gestern, (.*)$/, 'Yesterday, $1'],
+  [/^Weiter: (.*) →$/, 'Next: $1 →'], [/^Fertig \((\d+) ausgewählt\)$/, 'Done ($1 selected)'],
+  [/^(\d+) Übungen? in dieser Reihenfolge$/, (m, n) => n + (n === '1' ? ' exercise' : ' exercises') + ' in this order'],
+  [/^Tippe Übungen an, um sie zu „(.*)“ hinzuzufügen\. Die Nummer zeigt die Reihenfolge\.$/, 'Tap exercises to add them to “$1”. The number shows the order.'],
+  [/^Geplante Trainings \((\d+)\)$/, 'Planned workouts ($1)'],
+  [/^📲 Alle (\d+) Trainings in iPhone-Kalender$/, '📲 Add all $1 workouts to iPhone calendar'], [/^📲 Training in iPhone-Kalender$/, '📲 Add workout to iPhone calendar'],
+  [/^🔍 Übung suchen \((\d+) Übungen\)$/, '🔍 Search exercises ($1)'],
+  [/^Keine Übung „(.*)“ gefunden\.$/, 'No exercise “$1” found.'],
+  [/^Ausführung (.*)$/, 'How to: $1'],
+  [/^Satz (\d+) – tippen für Aufwärmsatz$/, 'Set $1 – tap for warm-up set'],
+  [/^im (\d+)\. Satz$/, 'in set $1'],
+  [/^✓ Ziel erreicht: (.*)$/, '✓ Goal reached: $1'], [/^🎯 Ziel: (.*)$/, '🎯 Goal: $1'],
+  [/^▲ (.*) kg mehr als letztes Mal$/, '▲ $1 kg more than last time'], [/^letztes Mal (.*)$/, 'last time $1'],
+  [/^Die App begrüßt dich damit: „Hallo (.*), bereit für dein nächstes Training\?“$/, 'The app greets you with: “Hi $1, ready for your next workout?”'],
+  [/^(.*) gestartet$/, '$1 started'], [/^(\d+) Trainings geplant$/, '$1 workouts planned'], [/^(\d+) min eingetragen$/, '$1 min logged'],
+  [/^(\d+) Trainingstage importiert$/, '$1 workout days imported'],
+  [/^seit (.*)$/, 'since $1'], [/^zuletzt (.*)$/, 'last $1'], [/^Letztes Backup: heute$/, 'Last backup: today'], [/^Letztes Backup: gestern$/, 'Last backup: yesterday'], [/^Letztes Backup: vor (\d+) Tagen$/, 'Last backup: $1 days ago'],
+  [/^Lade die Seite neu.*$/, 'Reload the page.'],
+  [/^Dein Name$/, 'Your name'],
+  [/^(.+) – deine bisherigen Trainings bleiben erhalten\.$/, '$1 – your previous workouts are kept.'],
+  [/^\(?Ausführung\)?$/, 'How to'],
+];
+// Einzelne Wörter in gemischten Texten (z. B. „1 Übung · 2 Sätze“)
+const TOK_EN = [
+  [/\b(\d+) Übungen\b/g, '$1 exercises'], [/\b1 Übung\b/g, '1 exercise'], [/\b(\d+) Sätze\b/g, '$1 sets'], [/\b1 Satz\b/g, '1 set'],
+  [/\b(\d+) Trainingstage\b/g, '$1 workout days'], [/\b1 Trainingstag\b/g, '1 workout day'], [/\b(\d+) geplant\b/g, '$1 planned'],
+  [/ Wdh\./g, ' reps'], [/Wdh\./g, 'reps'], [/ Uhr\b/g, ''], [/Erinnerung /g, 'Reminder '], [/ Std\. vorher/g, ' h before'], [/ min vorher/g, ' min before'],
+  [/Trainingszeit/g, 'Workout time'], [/Training beendet/g, 'Workout finished'], [/Bestwert/g, 'Best'], [/Volumen/g, 'Volume'], [/Heute/g, 'Today'], [/ heute\b/g, ' today'],
+  [/ seit /g, ' since '], [/1RM = geschätztes Maximum für 1 Wiederholung/g, '1RM = estimated max for 1 rep'], [/\(geschätzt\)/g, '(estimated)'],
+  [/Max\. Gewicht/g, 'Max weight'], [/Max\. Wdh\./g, 'Max reps'], [/Minuten/g, 'Minutes'], [/ · Erinnerung /g, ' · Reminder '], [/Training/g, 'Workout'],
+];
+
+if (LANG === 'en') { BUILTIN.forEach(x => { if (NAME_EN[x.id]) x.name = NAME_EN[x.id]; }); Object.assign(DESC, DESC_EN); }
+function trText(t) {
+  if (LANG !== 'en' || !t) return t;
+  const s = t.trim(); if (!s) return t;
+  let out = UI_EN[s];
+  if (out === undefined) {
+    out = s;
+    for (const [re, r] of RX_EN) { if (re.test(out)) { out = out.replace(re, r); break; } }
+    for (const [re, r] of TOK_EN) out = out.replace(re, r);
+  }
+  return out === s ? t : t.replace(s, out);
+}
+function trNode(root) {
+  if (LANG !== 'en' || !root) return;
+  if (root.nodeType === 3) { const v = trText(root.nodeValue); if (v !== root.nodeValue) root.nodeValue = v; return; }
+  if (root.nodeType !== 1 || root.closest('script,style')) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+  while ((n = w.nextNode())) { if (n.parentElement && n.parentElement.closest('script,style,textarea')) continue; const v = trText(n.nodeValue); if (v !== n.nodeValue) n.nodeValue = v; }
+  [root, ...root.querySelectorAll('[placeholder],[aria-label],[title]')].forEach(e => ['placeholder', 'aria-label', 'title'].forEach(a => { const v = e.getAttribute && e.getAttribute(a); if (v) { const t = trText(v); if (t !== v) e.setAttribute(a, t); } }));
+}
 const CATS = ['Aufwärmen', 'Brust', 'Rücken', 'Beine', 'Schultern', 'Arme', 'Bauch', 'Eigene'];
 
 /* ================= Persönliche Einstellungen ================= */
@@ -856,7 +987,7 @@ function bestEver(exId, beforeKey) {
 }
 const setsText = sets => validSets(sets).map(s => s.m != null ? fmtNum(s.m) + ' min' : (s.w != null ? fmtNum(s.w) + ' kg × ' : '') + (s.r ?? '–') + (s.wu ? ' (A)' : '')).join(' · ');
 const clock = sec => { sec = Math.max(0, Math.floor(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60; return (h ? h + ':' + pad(m) : m) + ':' + pad(x); };
-const hhmm = t => new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+const hhmm = t => new Date(t).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' });
 const fmtDur = ms => { const m = Math.round(ms / 60000); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + pad(m % 60) + ' min'; };
 const LIVE_MS = 30 * 60000; // nach 30 min ohne Eintrag gilt das Training als beendet
 function touchDay(k) { if (k !== todayKey()) return; const d = S.days[k]; if (!d) return; const now = Date.now(); if (!d.start) d.start = now; d.end = now; d.finished = null; }
@@ -931,8 +1062,10 @@ function viewSettings() {
     <h2>Design</h2>
     <div class="seg themeseg">${[['auto', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([v, l]) => `<button data-act="theme" data-v="${v}" class="${PREF.theme === v ? 'on' : ''}">${l}</button>`).join('')}</div>
     <div class="small muted" style="margin-top:6px">„Automatisch“ folgt der Einstellung deines iPhones.</div>
+    <h2>Sprache</h2>
+    <div class="seg themeseg">${[['auto', 'Automatisch'], ['de', 'Deutsch'], ['en', 'English']].map(([v, l]) => `<button data-act="lang" data-v="${v}" class="${(PREF.lang || 'auto') === v ? 'on' : ''}">${l}</button>`).join('')}</div>
     <h2>Vorschau</h2>
-    <div class="card row" style="gap:12px"><div style="width:54px;height:54px;color:var(--accent)">${icon('benchbb')}</div><div class="grow"><div class="title">Bankdrücken Langhantel</div><div class="goal" style="margin:2px 0 0">🎯 Ziel: 82,5 kg × 8 Wdh.</div></div><button class="btn primary sm">Start</button></div>
+    <div class="card row" style="gap:12px"><div style="width:54px;height:54px;color:var(--accent)">${icon('benchbb')}</div><div class="grow"><div class="title">${esc(exById('benchbb').name)}</div><div class="goal" style="margin:2px 0 0">🎯 Ziel: 82,5 kg × 8 Wdh.</div></div><button class="btn primary sm">Start</button></div>
     <h2>Daten</h2>
     <button class="btn block" data-act="settings-data">Backup & Daten (im Verlauf)</button>`;
 }
@@ -940,6 +1073,7 @@ function tileHTML(x, k) {
   const e = getEntry(k, x.id); const n = e ? validSets(e.sets).length : 0;
   return `<button class="tile ${n ? 'done' : ''}" data-act="open-ex" data-id="${x.id}">${runOf(k) && runOf(k).exId === x.id ? '<span class="badge run">▶ läuft</span>' : n ? `<span class="badge">${x.kind === 'cardio' ? fmtNum(validSets(e.sets).reduce((a, s) => a + (s.m || 0), 0)) + ' min' : n + ' ' + (n === 1 ? 'Satz' : 'Sätze')}</span>` : ''}${icon(x.icon, 'ic')}<span class="nm">${esc(x.name)}</span>${lastLine(x.id, k)}</button>`;
 }
+const dispName = e => { const x = exById(e.exId); return x ? x.name : e.name; };
 const routineById = id => S.routines.find(r => r.id === id);
 function routineGroup(r) {
   const cnt = {}; r.exIds.forEach(id => { const x = exById(id); if (x) cnt[x.cat] = (cnt[x.cat] || 0) + 1; });
@@ -1114,7 +1248,7 @@ function viewCardio(x, k, sets, prev) {
       <button class="btn block sw-btn go" data-act="run-start" ${k !== todayKey() ? 'disabled style="opacity:.4"' : ''}>▶ Start</button>`}
   </div>`;
   h += `<div class="card" style="padding:12px 16px"><table class="sets"><thead><tr><th>Dauer heute (Minuten)</th></tr></thead><tbody><tr>
-    <td><input inputmode="decimal" data-in="m" data-i="0" value="${s0.m != null ? String(s0.m).replace('.', ',') : ''}" placeholder="${pm != null ? fmtNum(pm) : '–'}">${prev ? `<div class="prev">zuletzt ${fmtNum(pm)} min</div>` : ''}</td>
+    <td><input inputmode="decimal" data-in="m" data-i="0" value="${s0.m != null ? String(s0.m).replace('.', DEC) : ''}" placeholder="${pm != null ? fmtNum(pm) : '–'}">${prev ? `<div class="prev">zuletzt ${fmtNum(pm)} min</div>` : ''}</td>
     </tr></tbody></table><div class="small muted" style="text-align:center;margin-top:4px">Wird bei „Stopp“ automatisch ausgefüllt, du kannst es aber auch selbst eintragen.</div></div>
     ${nextExButton(k, x.id)}`;
   return h;
@@ -1145,7 +1279,7 @@ function setRow(exId, s, i, prev, best, all) {
   const goal = t ? `<tr class="tgt"><td></td><td colspan="2"><div class="goal ${hit ? 'hit' : ''}" id="goal-${i}" data-tw="${t.w ?? ''}" data-tr="${t.r}" data-txt="${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.">${hit ? '✓ Ziel erreicht: ' : '🎯 Ziel: '}${t.w != null ? fmtNum(t.w) + ' kg × ' : ''}${t.r} Wdh.</div></td><td></td></tr>`
     : s.wu ? `<tr class="tgt"><td></td><td colspan="2"><div class="goal wu">Aufwärmsatz · zählt nicht für Ziele und Rekorde</div></td><td></td></tr>` : '';
   return goal + `<tr class="${up ? 'up' : ''} ${s.wu ? 'wu' : ''}"><td class="n"><button class="setno ${s.wu ? 'is-wu' : ''}" data-act="toggle-wu" data-i="${i}" aria-label="${s.wu ? 'Aufwärmsatz – tippen für Arbeitssatz' : 'Satz ' + (wi + 1) + ' – tippen für Aufwärmsatz'}">${s.wu ? 'A' : wi + 1}</button></td>
-    <td><input inputmode="decimal" data-in="w" data-i="${i}" value="${s.w != null ? String(s.w).replace('.', ',') : ''}" placeholder="${t && t.w != null ? fmtNum(t.w) : (p && p.w != null ? fmtNum(p.w) : '0')}">${p ? `<div class="prev">zuletzt ${p.w != null ? fmtNum(p.w) : '–'}</div>` : ''}</td>
+    <td><input inputmode="decimal" data-in="w" data-i="${i}" value="${s.w != null ? String(s.w).replace('.', DEC) : ''}" placeholder="${t && t.w != null ? fmtNum(t.w) : (p && p.w != null ? fmtNum(p.w) : '0')}">${p ? `<div class="prev">zuletzt ${p.w != null ? fmtNum(p.w) : '–'}</div>` : ''}</td>
     <td><input inputmode="numeric" data-in="r" data-i="${i}" value="${s.r ?? ''}" placeholder="${t ? t.r : (p && p.r != null ? p.r : '0')}">${p ? `<div class="prev">zuletzt ${p.r ?? '–'}${isPR ? '<span class="pr">Rekord</span>' : ''}</div>` : (isPR ? '<div class="prev"><span class="pr">Rekord</span></div>' : '')}</td>
     <td style="width:40px"><button class="icon-btn" data-act="del-set" data-i="${i}" aria-label="Satz löschen" style="width:34px">${SV.x}</button></td></tr>`;
 }
@@ -1161,15 +1295,15 @@ function viewHistory() {
   if (!keys.length) h += `<div class="empty"><div class="big">${calIcon(todayKey(), 44)}</div>Hier erscheinen deine Trainingstage.</div>`;
   let month = '';
   keys.forEach(k => {
-    const mo = keyDate(k).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+    const mo = keyDate(k).toLocaleDateString(LOC, { month: 'long', year: 'numeric' });
     if (mo !== month) { month = mo; h += `<h2>${esc(mo)}</h2>`; }
     const entries = S.days[k].entries.filter(e => validSets(e.sets).length);
     const open = S.openDay === k;
     h += `<div class="card"><div class="row" data-act="open-day" data-k="${k}" style="cursor:pointer">
       <div class="grow"><div class="title">${esc(relDay(k))}${relDay(k).length > 10 ? '' : ', ' + fmtKey(k, { day: '2-digit', month: '2-digit' })}</div>
-      <div class="small muted ellipsis">${(() => { const d = S.days[k]; return d.start && d.end && d.end > d.start ? '⏱ ' + fmtDur(d.end - d.start) + ' · ' : ''; })()}${entries.map(e => esc(e.name)).join(' · ')}</div></div><span class="muted">${open ? SV.up : SV.down}</span></div>`;
+      <div class="small muted ellipsis">${(() => { const d = S.days[k]; return d.start && d.end && d.end > d.start ? '⏱ ' + fmtDur(d.end - d.start) + ' · ' : ''; })()}${entries.map(e => esc(dispName(e))).join(' · ')}</div></div><span class="muted">${open ? SV.up : SV.down}</span></div>`;
     if (open) {
-      h += `<div style="margin-top:8px">` + entries.map(e => `<div class="sess-ex">${icon(e.icon, 'ic')}<div class="grow"><div style="font-weight:600">${esc(e.name)}</div><div class="small t2">${esc(setsText(e.sets))}</div></div></div>`).join('') +
+      h += `<div style="margin-top:8px">` + entries.map(e => `<div class="sess-ex">${icon(e.icon, 'ic')}<div class="grow"><div style="font-weight:600">${esc(dispName(e))}</div><div class="small t2">${esc(setsText(e.sets))}</div></div></div>`).join('') +
         `</div><div class="row" style="margin-top:10px"><button class="btn sm grow" data-act="edit-day" data-k="${k}">Bearbeiten</button><button class="btn sm danger" data-act="del-day" data-k="${k}">Tag löschen</button></div>`;
     }
     h += `</div>`;
@@ -1207,7 +1341,7 @@ function viewCalendar() {
   const { y, m } = S.cal;
   const first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate();
   const lead = (first.getDay() + 6) % 7, today = todayKey();
-  const title = first.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+  const title = first.toLocaleDateString(LOC, { month: 'long', year: 'numeric' });
   const stats = {}; let total = 0, planned = 0;
   let cells = '';
   for (let i = 0; i < lead; i++) cells += '<div class="cal-cell empty"></div>';
@@ -1305,7 +1439,7 @@ function daySummaryHTML(k) {
   const g = mainGroup(k), G = g && GROUPS[g];
   const dur = d.start && d.end && d.end > d.start ? ' · ⏱ ' + fmtDur(d.end - d.start) : '';
   return `${G ? `<div style="margin:2px 0 8px"><span class="cal-tag big" style="background:${G.col}">${G.ab}</span> <b>${esc(g)}-Tag</b><span class="muted small">${dur}</span></div>` : ''}` +
-    ents.map(e => `<div class="sess-ex">${icon(e.icon, 'ic')}<div class="grow"><div style="font-weight:600;color:var(--text)">${esc(e.name)}</div><div class="small t2">${esc(setsText(e.sets))}</div></div></div>`).join('');
+    ents.map(e => `<div class="sess-ex">${icon(e.icon, 'ic')}<div class="grow"><div style="font-weight:600;color:var(--text)">${esc(dispName(e))}</div><div class="small t2">${esc(setsText(e.sets))}</div></div></div>`).join('');
 }
 
 /* ---- Progress ---- */
@@ -1480,6 +1614,7 @@ document.addEventListener('click', async ev => {
     case 'settings-close': S.settings = false; render(); window.scrollTo(0, 0); break;
     case 'settings-data': S.settings = false; S.tab = 'history'; render(); window.scrollTo(0, document.body.scrollHeight); break;
     case 'accent': PREF.accent = el.dataset.c; savePrefs(); render(); break;
+    case 'lang': PREF.lang = el.dataset.v; savePrefs(); location.reload(); break;
     case 'theme': PREF.theme = el.dataset.v; savePrefs(); render(); break;
     case 'cal-open': { const d = keyDate(S.day); S.cal = { y: d.getFullYear(), m: d.getMonth() }; render(); window.scrollTo(0, 0); break; }
     case 'cal-close': S.cal = null; render(); break;
@@ -1661,6 +1796,12 @@ function showSplash() {
   const hide = () => { el.classList.add('out'); setTimeout(() => { el.remove(); }, 450); };
   el.addEventListener('click', hide, { once: true });
   setTimeout(hide, 2600);
+}
+if (LANG === 'en') {
+  Object.assign(GROUPS['Brust'], { ab: 'Ch' }); Object.assign(GROUPS['Rücken'], { ab: 'Bk' }); Object.assign(GROUPS['Beine'], { ab: 'Lg' });
+  Object.assign(GROUPS['Schultern'], { ab: 'Sh' }); Object.assign(GROUPS['Arme'], { ab: 'Ar' }); Object.assign(GROUPS['Bauch'], { ab: 'Ab' }); Object.assign(GROUPS['Aufwärmen'], { ab: 'Wu' });
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(trNode))).observe(document.body, { childList: true, subtree: true });
+  trNode(document.body);
 }
 Store.loadCache(); showSplash();
 Store.init();
